@@ -1,0 +1,49 @@
+{
+  "name": "roman-dates",
+  "version": "0.2.2",
+  "description": "JavaScript/TypeScript library for converting/calculating Roman and Easter date",
+  "main": "dist/roman-dates.js",
+  "types": "dist/roman-dates.d.ts",
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "tsc": "tsc",
+    "build": "WEBPACK_ENV=build webpack && npm run test",
+    "test": "karma start karma.conf.js --single-run",
+    "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UUDigitalHumanitieslab/roman-dates.git"
+  },
+  "keywords": [
+    "roman",
+    "typescript",
+    "dates",
+    "javascript",
+    "easter",
+    "conversion"
+  ],
+  "author": "Sheean Spoel (Utrecht University, Digital Humanities Lab)",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/UUDigitalHumanitieslab/roman-dates/issues"
+  },
+  "homepage": "https://github.com/UUDigitalHumanitieslab/roman-dates#readme",
+  "devDependencies": {
+    "@types/es6-shim": "^0.31.35",
+    "@types/jasmine": "^2.6.2",
+    "@types/karma": "^1.7.1",
+    "jasmine": "^2.8.0",
+    "karma": "^2.0.4",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-typescript": "^3.0.8",
+    "phantomjs-prebuilt": "^2.1.7",
+    "ts-loader": "^3.1.1",
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "typescript": "^2.6.1"
+  }
+}
