@@ -1,7 +1,7 @@
 module.exports = {
-    entry: './src/roman-dates.ts',
+    entry: './src/historical-dates.ts',
     output: {
-        filename: './dist/roman-dates.js',
+        filename: './dist/historical-dates.js',
         libraryTarget: 'umd'
     },
     resolve: {

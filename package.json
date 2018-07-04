@@ -1,9 +1,9 @@
 {
-  "name": "roman-dates",
+  "name": "historical-dates",
   "version": "0.0.1",
   "description": "JavaScript/TypeScript library for converting/calculating Roman and Easter date",
-  "main": "dist/roman-dates.js",
-  "types": "dist/roman-dates.d.ts",
+  "main": "dist/historical-dates.js",
+  "types": "dist/historical-dates.d.ts",
   "scripts": {
     "prepublishOnly": "npm run build",
     "tsc": "tsc",
@@ -13,9 +13,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UUDigitalHumanitieslab/roman-dates.git"
+    "url": "git+https://github.com/UUDigitalHumanitieslab/historical-dates.git"
   },
   "keywords": [
+    "historical",
+    "germanic",
     "roman",
     "typescript",
     "dates",
@@ -26,9 +28,9 @@
   "author": "Sheean Spoel (Utrecht University, Digital Humanities Lab)",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/UUDigitalHumanitieslab/roman-dates/issues"
+    "url": "https://github.com/UUDigitalHumanitieslab/historical-dates/issues"
   },
-  "homepage": "https://github.com/UUDigitalHumanitieslab/roman-dates#readme",
+  "homepage": "https://github.com/UUDigitalHumanitieslab/historical-dates#readme",
   "devDependencies": {
     "@types/es6-shim": "^0.31.35",
     "@types/jasmine": "^2.6.2",
