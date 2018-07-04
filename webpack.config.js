@@ -4,6 +4,7 @@ module.exports = {
         filename: './dist/historical-dates.js',
         libraryTarget: 'umd'
     },
+    devtool: "source-map",
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     },
