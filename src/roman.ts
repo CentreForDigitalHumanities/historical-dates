@@ -284,6 +284,9 @@ function romanCalendar(day: number, month: number, year: number) {
     if (text == 0) {
         rtxt = "Kal.";
         romanMonth++;
+        if (romanMonth == 13) {
+            romanMonth = 1;
+        }
     }
     else if (text == 1) {
         rtxt = "Id.";
@@ -292,10 +295,6 @@ function romanCalendar(day: number, month: number, year: number) {
         rtxt = "Non.";
     }
 
-    if (romanMonth == 13) {
-        romanMonth = 1;
-    }
-    
     const monthNames: rmonats[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
     rmonat = monthNames[romanMonth - 1];
 
