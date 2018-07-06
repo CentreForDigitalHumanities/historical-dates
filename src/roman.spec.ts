@@ -7,6 +7,8 @@ describe('Roman', () => {
         expectRoman(10, 12, 1815, 'a.d.IV.', 'Id.', 'Dec.', 'MDCCCXV');
         expectRoman(17, 5, 1792, 'a.d.XVI.', 'Kal.', 'Jun.', 'MDCCXCII');
         expectRoman(18, 3, 1634, 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
+        // original version had a missing month number here:
+        expectRoman(21, 12, 1401, 'a.d.XII.', 'Kal.', 'Ian.', 'MCDI');
     });
 
     it('Loop through all the dates', () => {

@@ -45,8 +45,8 @@ export type rtags = keyof typeof RTAG;
 export type rtxts = keyof typeof RTXT;
 
 export function toRoman(tag: number, monat: number, jahr: number) {
-    let { rtag, rtxt, rmonat } = rkalender(tag, monat, jahr);
-    let $youryear = ryear(jahr);
+    let { rtag, rtxt, rmonat } = romanCalendar(tag, monat, jahr);
+    let $youryear = toRomanNumber(jahr);
 
     return new RomanDate(rtag, rtxt, rmonat, $youryear);
 }
@@ -194,184 +194,115 @@ function length(value: any) {
     return `${value}`.length;
 }
 
-function rkalender(tag: number, monat: number, jahr: number) {
-    // P0
-    let $MCF = tag;
-    let $MC1F = monat;
-    let $MC2F = jahr;
-    // local($MCF,$MC1F,$MC2F)=@_;
-    // local(@MC);
-    // local($STR);
-    let $schaltjahr = 0;
+function romanCalendar(day: number, month: number, year: number) {
+    let leapYear = false;
 
-    if ($MC2F % 4 == 0) {
-        if (!((`${$MC2F}`.substr(-2) == "00") && (`${$MC2F}`.substr(-3, 1) != "0"))) {
-            $schaltjahr = 1;
+    if (year % 4 == 0) {
+        if (!((`${year}`.substr(-2) == "00") && (`${year}`.substr(-3, 1) != "0"))) {
+            leapYear = true;
         }
     }
 
-    if (($MCF > 29) && ($MC1F == 2)) {
+    if ((day > 29) && (month == 2)) {
         throw new InvalidDateException();
     }
-    else if (($MCF > 28) && ($MC1F == 2) && ($schaltjahr == 0)) {
+    else if ((day > 28) && (month == 2) && !leapYear) {
         throw new InvalidDateException();
     }
-    else if (($MCF > 30) && (($MC1F == 4) || ($MC1F == 6) || ($MC1F == 9) || ($MC1F == 11))) {
+    else if ((day > 30) && ((month == 4) || (month == 6) || (month == 9) || (month == 11))) {
         throw new InvalidDateException();
     }
-    else if (($MCF > 31) && (($MC1F == 1) || ($MC1F == 3) || ($MC1F == 5) || ($MC1F == 7) || ($MC1F == 10) || ($MC1F == 12))) {
+    else if ((day > 31) && ((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 10) || (month == 12))) {
         throw new InvalidDateException();
     }
-    else if (($MC1F < 1) || ($MC1F > 12)) {
+    else if ((month < 1) || (month > 12)) {
         throw new InvalidDateException();
     }
-    else if ($MCF < 1) {
+    else if (day < 1) {
         throw new InvalidDateException();
     }
 
-    if (($MCF >= 15) && ($MC1F == 2) && ($schaltjahr == 1)) {
-        $MCF--;
+    if ((day >= 15) && (month == 2) && leapYear) {
+        day--;
     }
-    else if (($MCF == 14) && ($MC1F == 2) && ($schaltjahr == 1)) {
+    else if ((day == 14) && (month == 2) && leapYear) {
         return {
             rtag: 'a.d.XVII.' as rtags,
             rtxt: 'Kal.' as rtxts,
             rmonat: 'Mart.' as rmonats
         };
     }
-    // P5 (SUB)
-    let $MC = [0, 0, 0, $MCF, $MC1F, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0, $MC1F + 4, 0];
-    // P5 (END)
 
-    // P0 (BACK)
-    if ($MC[3] == 1) {
-        $MC[3] = $MC[$MC[18]] + 1;                                       // P0LBL3
+    let monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let text = 0;
+    let beforeText = 0;
+    let textDay = day;
+    let romanMonth = month;
+
+    if (textDay == 1) {
+        textDay = monthDays[month - 1] + 1;
     }
-    // P0LBL4
-    if (($MC[4] == 3) || ($MC[4] == 5) || ($MC[4] == 7) || ($MC[4] == 10)) {
-        if ($MC[3] < 16) {                                           // P0LBL1
-            $MC[0] = 1;
-            $MC[3] = $MC[3] + 17;
-            if ($MC[3] < 25) {
-                $MC[0] = 2;
-                $MC[3] = $MC[3] + 8;
+
+    if ((romanMonth == 3) || (romanMonth == 5) || (romanMonth == 7) || (romanMonth == 10)) {
+        // within the Id.?
+        if (textDay < 16) {
+            text = 1;
+            textDay = textDay + 17;
+            if (textDay < 25) {
+                text = 2;
+                textDay = textDay + 8;
             }
         }
-    }
-    else {
-        if ($MC[3] < 14) {                                           // P0LBL2
-            $MC[0] = 1;
-            $MC[8] = $MC[10] = $MC[13] = $MC[15] = $MC[6] = 31;
-            $MC[3] = $MC[3] + 19;
-            if ($MC[3] < 25) {
-                $MC[0] = 2;
-                $MC[3] = $MC[3] + 8;
-            }
+    } else if (textDay < 14) {
+        text = 1;
+        monthDays[1] = monthDays[3] = monthDays[5] = monthDays[8] = monthDays[10] = 31;
+        textDay = textDay + 19;
+        if (textDay < 25) {
+            text = 2;
+            textDay = textDay + 8;
         }
     }
-    // P0LBL9
-    $MC[1] = $MC[$MC[18]] + 2 - $MC[3];
-    //    print "$MC[0] $MC[1] $MC[2] $MC[3] $MC[4]\n"; 
+
+    // how many days before the Kal. Id. or Non.?
+    beforeText = monthDays[month - 1] + 2 - textDay;
+
     let rtag: rtags, rtxt: rtxts, rmonat: rmonats;
 
-    // P1 (SUB)
-    if ($MC[1] == 1) {
-        rtag = "";                                                    // P1LBL1
-        if ($MC[0] == 0) {
-            $MC[4]--;                                                // P1LBL4
+    if (beforeText == 1) {
+        rtag = "";
+        if (text == 0) {
+            romanMonth--;
         }
     }
-    else if ($MC[1] == 2) {
-        rtag = "pr.";                                                  // P1LBL2
+    else if (beforeText == 2) {
+        rtag = "pr.";
     }
     else {
-        let $STR = "a.d.";
-        // P6 (SUB)
-        $MC[2] = ($MC[1] - ($MC[1] % 10)) / 10;
-        //if ($MC[1]>9) {
-        //    $MC[2]=1;
-        //}
-        //else {
-        //    $MC[2]=0;
-        //}
-        // P8 (SUB)
-        if ($MC[2] == 1) {
-            $STR = $STR + "X";                                         // P8LBL1
-        }
-        // P8LBL0
-        // P8 (END)
-        // P6 (BACK)
-        // P7 (SUB)
-        $MC[2] = $MC[1] % 10;                                            // P8LBL1
-        //if ($MC[1]>9) {
-        //    $MC[2]=$MC[1]-10;                                        // P8LBL1
-        //}
-        // P7 (END)
-        // P6 (BACK)
-        // P9 (SUB)
-        let $ZAHL = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", ""];
-        $STR = $STR + ($ZAHL[$MC[2] - 1] || '');
-        //if ($MC[2]==1) { $STR=$STR . "I"; }                          // P9LBL1
-        //else if ($MC[2]==2) { $STR=$STR . "II"; }                      // P9LBL2
-        //else if ($MC[2]==3) { $STR=$STR . "III"; }                     // P9LBL3
-        //else if ($MC[2]==4) { $STR=$STR . "IV"; }                      // P9LBL4
-        //else if ($MC[2]==5) { $STR=$STR . "V"; }                       // P9LBL5
-        //else if ($MC[2]==6) { $STR=$STR . "VI"; }                      // P9LBL6
-        //else if ($MC[2]==7) { $STR=$STR . "VII"; }                     // P9LBL7
-        //else if ($MC[2]==8) { $STR=$STR . "VIII"; }                    // P9LBL8
-        //else if ($MC[2]==9) { $STR=$STR . "IX"; }                      // P9LBL9
-        // P9LBL0
-        // P9 (END)
-        // P6 (END)
-        // P1 (BACK)
-        rtag = $STR + "." as rtags;
+        rtag = `a.d.${toRomanNumber(beforeText)}.` as rtags;
     }
-    // P1LBL3
-    // P1 (END)
-    // P0 (BACK)
-    // P2 (SUB)
-    if ($MC[0] == 0) {
-        rtxt = "Kal.";                                          // P2LBL0
-        $MC[4]++;
-        if ($MC[4] == 13) {
-            $MC[4] = 1;                                                // P2LBL4
-        }
+
+    if (text == 0) {
+        rtxt = "Kal.";
+        romanMonth++;
     }
-    else if ($MC[0] == 1) {
-        rtxt = "Id.";                                           // P2LBL1
+    else if (text == 1) {
+        rtxt = "Id.";
     }
-    else if ($MC[0] == 2) {
-        rtxt = "Non.";                                          // P2LBL2
+    else if (text == 2) {
+        rtxt = "Non.";
     }
-    // P2LBL3
-    // P2 (END)
-    // P0 (BACK)
-    // P3 (SUB)
-    let $MONAT: rmonats[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
-    rmonat = $MONAT[$MC[4] - 1];
-    //if ($MC[4]==1) { $STR=$STR . "Ian."; }                           // P3LBL1
-    //else if ($MC[4]==2) { $STR=$STR . "Feb."; }                        // P3LBL2
-    //else if ($MC[4]==3) { $STR=$STR . "Mart."; }                       // P3LBL3
-    //else if ($MC[4]==4) { $STR=$STR . "Apr."; }                        // P3LBL4
-    //else if ($MC[4]==5) { $STR=$STR . "Mai."; }                        // P3LBL5
-    //else if ($MC[4]==6) { $STR=$STR . "Jun."; }                        // P3LBL6
-    //else if ($MC[4]==7) { $STR=$STR . "Jul."; }                        // P3LBL7
-    // P4 (SUB)
-    //else if ($MC[4]==8) { $STR=$STR . "Sext."; }                       // P4LBL1
-    //else if ($MC[4]==9) { $STR=$STR . "Sept."; }                       // P4LBL2
-    //else if ($MC[4]==10) { $STR=$STR . "Oct."; }                       // P4LBL3
-    //else if ($MC[4]==11) { $STR=$STR . "Nov."; }                       // P4LBL4
-    //else if ($MC[4]==12) { $STR=$STR . "Dec."; }                       // P4LBL5
-    // P4LBL0
-    // P4 (END)
-    // P3LBL0
-    // P3 (END)
-    // P0 (BACK)
+
+    if (romanMonth == 13) {
+        romanMonth = 1;
+    }
+    
+    const monthNames: rmonats[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
+    rmonat = monthNames[romanMonth - 1];
 
     return { rtag, rtxt, rmonat };
 }
 
-function ryear($year: number) {
+function toRomanNumber($year: number) {
     let $t = ($year - $year % 1000) / 1000;
     let $h = (($year - $year % 100) / 100) - ($t * 10);
     let $z = (($year - $year % 10) / 10) - ($t * 100 + $h * 10);
