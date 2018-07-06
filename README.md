@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=master)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
+
 # Roman Dates
 JavaScript/TypeScript library for converting/calculating Roman and Easter dates. Based on [Axel Findling's Roman date converter](http://cgi.axel-findling.de/cgi-bin/romdat) and [Nikolaus A. Bär's easter date calculator](http://www.nabkal.de/ostrech1.html).
 

@@ -3,7 +3,7 @@
  * Originally written by Axel Findling.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-import { isLeapYear } from './common';
+import { isLeapYear, HistoricalDate, Calendar } from './common';
 export const RomanMonths = {
     "Ian.": 1,
     "Feb.": 2,
@@ -52,12 +52,12 @@ export function toRoman(day: number, month: number, year: number) {
     return new RomanDate(romanDay, romanText, romanMonthName, romanYear);
 }
 
-export function fromRoman(day: RomanDay, text: RomanText, month: RomanMonth, year: string) {
+export function fromRoman(day: RomanDay, text: RomanText, month: RomanMonth, year: string, calendar: Calendar = 'gregorian') {
     year = year.replace(/[^MDCLXVI]/gi, '').toUpperCase();
     let germanYear = fromRomanNumber(year);
     let date = germanCalendar(RomanDays[day], RomanTexts[text], RomanMonths[month], germanYear);
 
-    return { day: date.day, month: date.month, year: germanYear };
+    return new HistoricalDate(germanYear, date.month, date.day, calendar);
 }
 
 function fromRomanNumber(value: string) {
