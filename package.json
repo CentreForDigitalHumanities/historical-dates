@@ -7,9 +7,9 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "tsc": "tsc",
-    "build": "WEBPACK_ENV=build webpack && npm run test",
+    "build": "webpack && npm run test",
     "test": "karma start karma.conf.js --single-run",
-    "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch"
+    "dev": "webpack --progress --colors --watch"
   },
   "repository": {
     "type": "git",
