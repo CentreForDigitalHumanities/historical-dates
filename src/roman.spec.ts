@@ -1,4 +1,4 @@
-import { fromRoman, toRoman, rtags, rtxts, rmonats, RomanDate } from './roman';
+import { fromRoman, toRoman, RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
 describe('Roman', () => {
     it('Converts Roman dates', () => {
         expectRoman(5, 6, 2018, '', 'Non.', 'Jun.', 'MMXVIII');
@@ -7,13 +7,16 @@ describe('Roman', () => {
         expectRoman(10, 12, 1815, 'a.d.IV.', 'Id.', 'Dec.', 'MDCCCXV');
         expectRoman(17, 5, 1792, 'a.d.XVI.', 'Kal.', 'Jun.', 'MDCCXCII');
         expectRoman(18, 3, 1634, 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
-        // original version had a missing month number here:
+        // wrap-around of last days of December to January:
         expectRoman(21, 12, 1401, 'a.d.XII.', 'Kal.', 'Ian.', 'MCDI');
+        // leap year in 1600
+        expectRoman(29, 2, 1600, 'pr.', 'Kal.', 'Mart.', 'MDC');
     });
 
-    it('Loop through all the dates', () => {
+    it('Converts and reverts all dates', () => {
         let today = new Date();
-        for (let date = new Date(1400, 1, 1), i = 0; date < today && i < 1000; i++) {
+        let date = new Date(1400, 1, 1);
+        while (date < today) {
             let year = date.getFullYear();
             let month = date.getMonth() + 1;
             let day = date.getDate();
@@ -21,7 +24,7 @@ describe('Roman', () => {
             try {
                 roman = null;
                 roman = toRoman(day, month, year);
-                let back = fromRoman(roman.rtag, roman.rtxt, roman.rmonat, roman.year);
+                let back = fromRoman(roman.day, roman.text, roman.month, roman.year);
 
                 let fromString = `${day}-${month}-${year}`;
                 let backString = `${back.day}-${back.month}-${back.year}`;
@@ -46,9 +49,9 @@ describe('Roman', () => {
     function expectRoman<T>(day: number,
         month: number,
         year: number,
-        romanDay: rtags,
-        romanText: rtxts,
-        romanMonth: rmonats,
+        romanDay: RomanDay,
+        romanText: RomanText,
+        romanMonth: RomanMonth,
         romanYear: string) {
         let expected = `${romanDay}${romanText}${romanMonth} ${romanYear}`;
 

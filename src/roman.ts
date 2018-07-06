@@ -1,9 +1,10 @@
+import { isLeapYear } from './common';
 /**
  * Derived from http://cgi.axel-findling.de/cgi-bin/romdat
  * Originally written by Axel Findling.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-const RMONAT = {
+export const RomanMonths = {
     "Ian.": 1,
     "Feb.": 2,
     "Mart.": 3,
@@ -17,7 +18,7 @@ const RMONAT = {
     "Nov.": 11,
     "Dec.": 12
 };
-const RTAG = {
+export const RomanDays = {
     "": 1,
     "pr.": 2,
     "a.d.III.": 3,
@@ -38,150 +39,139 @@ const RTAG = {
     "a.d.XVIII.": 18,
     "a.d.XIX.": 19
 };
-const RTXT = { "Kal.": 1, "Non.": 2, "Id.": 3 };
+export const RomanTexts = { "Kal.": 1, "Non.": 2, "Id.": 3 };
 
-export type rmonats = keyof typeof RMONAT;
-export type rtags = keyof typeof RTAG;
-export type rtxts = keyof typeof RTXT;
+export type RomanMonth = keyof typeof RomanMonths;
+export type RomanDay = keyof typeof RomanDays;
+export type RomanText = keyof typeof RomanTexts;
 
-export function toRoman(tag: number, monat: number, jahr: number) {
-    let { rtag, rtxt, rmonat } = romanCalendar(tag, monat, jahr);
-    let $youryear = toRomanNumber(jahr);
+export function toRoman(day: number, month: number, year: number) {
+    let { romanDay, romanText, romanMonth, romanMonthName } = romanCalendar(day, month, year);
+    let romanYear = toRomanNumber(year);
 
-    return new RomanDate(rtag, rtxt, rmonat, $youryear);
+    return new RomanDate(romanDay, romanText, romanMonthName, romanYear);
 }
 
-export function fromRoman<T>(rtag: rtags, rtxt: rtxts, rmonat: rmonats, rjahr: string) {
-    rjahr = rjahr.replace(/[^MDCLXVI]/gi, '').toUpperCase();
-    let $youryear = dyear(rjahr);
-    let $yourday = rkaldkal(RTAG[rtag], RTXT[rtxt], RMONAT[rmonat], $youryear);
+export function fromRoman(day: RomanDay, text: RomanText, month: RomanMonth, year: string) {
+    year = year.replace(/[^MDCLXVI]/gi, '').toUpperCase();
+    let germanYear = fromRomanNumber(year);
+    let date = germanCalendar(RomanDays[day], RomanTexts[text], RomanMonths[month], germanYear);
 
-    return { day: $yourday.day, month: $yourday.month, year: $youryear };
+    return { day: date.day, month: date.month, year: germanYear };
 }
 
-function dyear($year: string) {
-    let $i = 0;
-    let $res = 0;
+function fromRomanNumber(value: string) {
+    let index = 0;
+    let result = 0;
 
-    if (substr($year, $i, 3) == "MMM") { $res += 3000; $i += 3; }
-    else if (substr($year, $i, 2) == "MM") { $res += 2000; $i += 2; }
-    else if (substr($year, $i, 1) == "M") { $res += 1000; $i += 1; }
+    if (substr(value, index, 3) == "MMM") { result += 3000; index += 3; }
+    else if (substr(value, index, 2) == "MM") { result += 2000; index += 2; }
+    else if (substr(value, index, 1) == "M") { result += 1000; index += 1; }
 
-    if (substr($year, $i, 2) == "CM") { $res += 900; $i += 2; }
-    else if (substr($year, $i, 4) == "DCCC") { $res += 800; $i += 4; }
-    else if (substr($year, $i, 3) == "DCC") { $res += 700; $i += 3; }
-    else if (substr($year, $i, 2) == "DC") { $res += 600; $i += 2; }
-    else if (substr($year, $i, 1) == "D") { $res += 500; $i += 1; }
-    else if (substr($year, $i, 2) == "CD") { $res += 400; $i += 2; }
-    else if (substr($year, $i, 3) == "CCC") { $res += 300; $i += 3; }
-    else if (substr($year, $i, 2) == "CC") { $res += 200; $i += 2; }
-    else if (substr($year, $i, 1) == "C") { $res += 100; $i += 1; }
+    if (substr(value, index, 2) == "CM") { result += 900; index += 2; }
+    else if (substr(value, index, 4) == "DCCC") { result += 800; index += 4; }
+    else if (substr(value, index, 3) == "DCC") { result += 700; index += 3; }
+    else if (substr(value, index, 2) == "DC") { result += 600; index += 2; }
+    else if (substr(value, index, 1) == "D") { result += 500; index += 1; }
+    else if (substr(value, index, 2) == "CD") { result += 400; index += 2; }
+    else if (substr(value, index, 3) == "CCC") { result += 300; index += 3; }
+    else if (substr(value, index, 2) == "CC") { result += 200; index += 2; }
+    else if (substr(value, index, 1) == "C") { result += 100; index += 1; }
 
-    if (substr($year, $i, 2) == "XC") { $res += 90; $i += 2; }
-    else if (substr($year, $i, 4) == "LXXX") { $res += 80; $i += 4; }
-    else if (substr($year, $i, 3) == "LXX") { $res += 70; $i += 3; }
-    else if (substr($year, $i, 2) == "LX") { $res += 60; $i += 2; }
-    else if (substr($year, $i, 1) == "L") { $res += 50; $i += 1; }
-    else if (substr($year, $i, 2) == "XL") { $res += 40; $i += 2; }
-    else if (substr($year, $i, 3) == "XXX") { $res += 30; $i += 3; }
-    else if (substr($year, $i, 2) == "XX") { $res += 20; $i += 2; }
-    else if (substr($year, $i, 1) == "X") { $res += 10; $i += 1; }
+    if (substr(value, index, 2) == "XC") { result += 90; index += 2; }
+    else if (substr(value, index, 4) == "LXXX") { result += 80; index += 4; }
+    else if (substr(value, index, 3) == "LXX") { result += 70; index += 3; }
+    else if (substr(value, index, 2) == "LX") { result += 60; index += 2; }
+    else if (substr(value, index, 1) == "L") { result += 50; index += 1; }
+    else if (substr(value, index, 2) == "XL") { result += 40; index += 2; }
+    else if (substr(value, index, 3) == "XXX") { result += 30; index += 3; }
+    else if (substr(value, index, 2) == "XX") { result += 20; index += 2; }
+    else if (substr(value, index, 1) == "X") { result += 10; index += 1; }
 
-    if (substr($year, $i, 2) == "IX") { $res += 9; $i += 2; }
-    else if (substr($year, $i, 4) == "VIII") { $res += 8; $i += 4; }
-    else if (substr($year, $i, 3) == "VII") { $res += 7; $i += 3; }
-    else if (substr($year, $i, 2) == "VI") { $res += 6; $i += 2; }
-    else if (substr($year, $i, 1) == "V") { $res += 5; $i += 1; }
-    else if (substr($year, $i, 2) == "IV") { $res += 4; $i += 2; }
-    else if (substr($year, $i, 3) == "III") { $res += 3; $i += 3; }
-    else if (substr($year, $i, 2) == "II") { $res += 2; $i += 2; }
-    else if (substr($year, $i, 1) == "I") { $res += 1; $i += 1; }
+    if (substr(value, index, 2) == "IX") { result += 9; index += 2; }
+    else if (substr(value, index, 4) == "VIII") { result += 8; index += 4; }
+    else if (substr(value, index, 3) == "VII") { result += 7; index += 3; }
+    else if (substr(value, index, 2) == "VI") { result += 6; index += 2; }
+    else if (substr(value, index, 1) == "V") { result += 5; index += 1; }
+    else if (substr(value, index, 2) == "IV") { result += 4; index += 2; }
+    else if (substr(value, index, 3) == "III") { result += 3; index += 3; }
+    else if (substr(value, index, 2) == "II") { result += 2; index += 2; }
+    else if (substr(value, index, 1) == "I") { result += 1; index += 1; }
 
-    if ($i != length($year)) {
+    if (index != length(value)) {
         throw new InvalidDateException();
     }
 
-    return $res;
+    return result;
 }
 
-function rkaldkal($MI1: number, $MI0: number, $MI2: number, $MC2F: number) {
-    // P0
-    let $MC, $schaltjahr = 0;
+function germanCalendar(romanDay: number, romanText: number, romanMonth: number, year: number) {
+    let leapYear = isLeapYear(year);
 
-    if ($MC2F % 4 == 0) {
-        if (!((substr($MC2F, length($MC2F) - 2, 2) == "00") && (substr($MC2F, length($MC2F) - 3, 1) != "0"))) {
-            $schaltjahr = 1;
-        }
-    }
-    if (($MI0 == 1) && ($MI2 == 3) && ($schaltjahr == 1)) {
-        $MI1--;
-        if ($MI1 == 1) {
+    if ((romanText == 1) && (romanMonth == 3) && leapYear) {
+        romanDay--;
+        if (romanDay == 1) {
             return { day: 29, month: 2 };
         }
     }
 
-    //    @MONAT=("", "Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
-
-    if ($MI1 == 1) {
-        $MI1 = 0;
+    if (romanDay == 1) {
+        romanDay = 0;
     }
 
-    $MC = [$MI0, $MI1, $MI2, 0, 0, $MI2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let $MC0 = romanText;
+    let $MC1 = romanDay;
+    let day = 0;
+    let $MC4 = 0;
+    let month = romanMonth;
 
-    if ($MC[1] == 0) {
-        // P0LBL8
-        // P5 (SUB)
-        $MC[1] = 1;
-        if ($MC[0] == 1) {
-            $MC[0] = 4;
+    if ($MC1 == 0) {
+        $MC1 = 1;
+        if ($MC0 == 1) {
+            // first day of month
+            $MC0 = 4;
         }
-        // P5 (END)
     }
-    // P0LBL9
-    if ($MC[0] == 1) {
-        $MC[5] = $MC[2] - 1;                                                // P0LBL1
+
+    if ($MC0 == 1) {
+        // before the Kalendes
+        month = romanMonth == 1 ? 12 : romanMonth - 1;
     }
-    else if (($MC[2] == 3) || ($MC[2] == 5) || ($MC[2] == 7) || ($MC[2] == 10)) {
-        $MC[1] = $MC[1] - 2;                                                // P0LBL2
+    else if ((romanMonth == 3) || (romanMonth == 5) || (romanMonth == 7) || (romanMonth == 10)) {
+        $MC1 = $MC1 - 2;
     }
-    // P0LBL3
-    if (($MC[5] == 4) || ($MC[5] == 6) || ($MC[5] == 9) || ($MC[5] == 11)) {
-        $MC[4] = 32;                                                      // P0LBL4
+
+    if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
+        $MC4 = 32;
     }
-    else if ($MC[5] == 2) {
-        $MC[4] = 30;                                                      // P0LBL5
+    else if (month == 2) {
+        $MC4 = 30;
     }
     else {
-        $MC[4] = 33;                                                      // P0LBL6
-    }
-    // P0LBL7
-    if ($MC[0] == 1) {
-        // P1 (SUB)
-        $MC[3] = $MC[4] - $MC[1];
-        // P1 (END)
-    }
-    else if ($MC[0] == 2) {
-        // P2 (SUB)
-        $MC[3] = 6 - $MC[1];
-        // P2 (END)
-    }
-    else if ($MC[0] == 3) {
-        // P3 (SUB)
-        $MC[3] = 14 - $MC[1];
-        // P3 (END)
-    }
-    else if ($MC[0] == 4) {
-        // P4 (SUB)
-        $MC[3] = 1;
-        // P4 (END)
+        $MC4 = 33;
     }
 
-    if (($MC[3] < 1) || ($MC[3] > 31)) {
+    switch ($MC0) {
+        case 1:
+            day = $MC4 - $MC1;
+            break;
+        case 2:
+            day = 6 - $MC1;
+            break;
+        case 3:
+            day = 14 - $MC1;
+            break;
+        case 4:
+            day = 1;
+            break;
+    }
+
+    if ((day < 1) || (day > 31)) {
         throw new InvalidDateException();
     } else {
         return {
-            day: $MC[3],
-            month: $MC[5]
+            day,
+            month
         };
     }
 }
@@ -195,13 +185,7 @@ function length(value: any) {
 }
 
 function romanCalendar(day: number, month: number, year: number) {
-    let leapYear = false;
-
-    if (year % 4 == 0) {
-        if (!((`${year}`.substr(-2) == "00") && (`${year}`.substr(-3, 1) != "0"))) {
-            leapYear = true;
-        }
-    }
+    let leapYear = isLeapYear(year);
 
     if ((day > 29) && (month == 2)) {
         throw new InvalidDateException();
@@ -227,9 +211,10 @@ function romanCalendar(day: number, month: number, year: number) {
     }
     else if ((day == 14) && (month == 2) && leapYear) {
         return {
-            rtag: 'a.d.XVII.' as rtags,
-            rtxt: 'Kal.' as rtxts,
-            rmonat: 'Mart.' as rmonats
+            romanDay: 'a.d.XVII.' as RomanDay,
+            romanText: 'Kal.' as RomanText,
+            romanMonth: 3,
+            romanMonthName: 'Mart.' as RomanMonth
         };
     }
 
@@ -266,39 +251,39 @@ function romanCalendar(day: number, month: number, year: number) {
     // how many days before the Kal. Id. or Non.?
     beforeText = monthDays[month - 1] + 2 - textDay;
 
-    let rtag: rtags, rtxt: rtxts, rmonat: rmonats;
+    let romanDay: RomanDay, romanText: RomanText, romanMonthName: RomanMonth;
 
     if (beforeText == 1) {
-        rtag = "";
+        romanDay = "";
         if (text == 0) {
             romanMonth--;
         }
     }
     else if (beforeText == 2) {
-        rtag = "pr.";
+        romanDay = "pr.";
     }
     else {
-        rtag = `a.d.${toRomanNumber(beforeText)}.` as rtags;
+        romanDay = `a.d.${toRomanNumber(beforeText)}.` as RomanDay;
     }
 
     if (text == 0) {
-        rtxt = "Kal.";
+        romanText = "Kal.";
         romanMonth++;
         if (romanMonth == 13) {
             romanMonth = 1;
         }
     }
     else if (text == 1) {
-        rtxt = "Id.";
+        romanText = "Id.";
     }
     else if (text == 2) {
-        rtxt = "Non.";
+        romanText = "Non.";
     }
 
-    const monthNames: rmonats[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
-    rmonat = monthNames[romanMonth - 1];
+    const monthNames: RomanMonth[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
+    romanMonthName = monthNames[romanMonth - 1];
 
-    return { rtag, rtxt, rmonat };
+    return { romanDay, romanText, romanMonth, romanMonthName };
 }
 
 function toRomanNumber($year: number) {
@@ -314,14 +299,14 @@ function toRomanNumber($year: number) {
 }
 
 export class RomanDate {
-    constructor(public rtag: rtags,
-        public rtxt: rtxts,
-        public rmonat: rmonats,
+    constructor(public day: RomanDay,
+        public text: RomanText,
+        public month: RomanMonth,
         public year: string) {
     }
 
     toString() {
-        return `${this.rtag}${this.rtxt}${this.rmonat} ${this.year}`;
+        return `${this.day}${this.text}${this.month} ${this.year}`;
     }
 }
 
