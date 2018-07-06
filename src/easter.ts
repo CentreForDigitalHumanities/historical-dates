@@ -1,11 +1,13 @@
 /**
  * Derived from http://www.nabkal.de/ostrech1.html
+ * Originally written by Nikolaus A. Bär.
+ * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
 export type Calendar = 'julian' | 'gregorian';
 const Littera = ["f", "e", "d", "c", "b", "A", "g"];
 const EpaktFeld = ["XXIII", "XXII", "XXI", "XX", "XIX", "XVIII", "XVII", "XVI", "XV", "XIV", "XIII", "XII", "XI", "X", "IX", "VIII", "VII", "VI", "V", "IV", "III", "II", "I", " * ", "XXIX", "XXVIII", "XXVII", "XXVI", "XXV", "XXIV", "25"];
 
-export function calculate(year: number, style: Calendar) {
+export function easterDates(year: number, style: Calendar) {
     let easterDay = getEasterDay(year, style);
     let jd = easterDay.jd;
 
