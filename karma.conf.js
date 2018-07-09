@@ -1,6 +1,7 @@
 var typescriptConfig = require('./tsconfig.json');
 typescriptConfig.compilerOptions.allowJs = true;
 typescriptConfig.compilerOptions.declaration = false;
+typescriptConfig.compilerOptions.strictNullChecks = false;
 module.exports = function (config) {
     let configuration = {
         basePath: '',

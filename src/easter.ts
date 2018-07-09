@@ -3,7 +3,7 @@
  * Originally written by Nikolaus A. Bär.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-import { Calendar, HistoricalDate } from './common';
+import { Calendar, createDate } from './common';
 
 type DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];
 const DominicalLetters: DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];
@@ -66,7 +66,7 @@ function makeDate(jd: number, calendar: Calendar) {
     let day = r - floor(month * 30.6 + 0.5);
     month += 3;
     if (month > 12) { month -= 12; year++ }
-    return new HistoricalDate(year, month, day, calendar);
+    return createDate(year, month, day, calendar);
 }
 
 function makeDateAdv(year: number, calendar: Calendar) {

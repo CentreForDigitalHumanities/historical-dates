@@ -3,7 +3,7 @@
  * Originally written by Axel Findling.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-import { isLeapYear, HistoricalDate, Calendar } from './common';
+import { isLeapYear, Calendar, InvalidDateException, createDate, HistoricalDate } from './common';
 export const RomanMonths = {
     "Ian.": 1,
     "Feb.": 2,
@@ -45,19 +45,37 @@ export type RomanMonth = keyof typeof RomanMonths;
 export type RomanDay = keyof typeof RomanDays;
 export type RomanText = keyof typeof RomanTexts;
 
-export function toRoman(day: number, month: number, year: number) {
-    let { romanDay, romanText, romanMonth, romanMonthName } = romanCalendar(day, month, year);
-    let romanYear = toRomanNumber(year);
+export class RomanDate {
+    constructor(public day: RomanDay,
+        public text: RomanText,
+        public month: RomanMonth,
+        public year: string,
+        public calendar: Calendar = 'gregorian') {
+    }
 
-    return new RomanDate(romanDay, romanText, romanMonthName, romanYear);
-}
+    static fromDate(date: HistoricalDate) {
+        let { romanDay, romanText, romanMonthName } = romanCalendar(date);
+        let romanYear = toRomanNumber(date.year);
 
-export function fromRoman(day: RomanDay, text: RomanText, month: RomanMonth, year: string, calendar: Calendar = 'gregorian') {
-    year = year.replace(/[^MDCLXVI]/gi, '').toUpperCase();
-    let germanYear = fromRomanNumber(year);
-    let date = germanCalendar(RomanDays[day], RomanTexts[text], RomanMonths[month], germanYear);
+        return new RomanDate(romanDay, romanText, romanMonthName, romanYear, date.calendar);
+    }
 
-    return new HistoricalDate(germanYear, date.month, date.day, calendar);
+    toString() {
+        return `${this.day}${this.text}${this.month} ${this.year}`;
+    }
+
+    toDate() {
+        let year = this.year.replace(/[^MDCLXVI]/gi, '').toUpperCase();
+        let germanYear = fromRomanNumber(year);
+        let date = germanCalendar(
+            RomanDays[this.day],
+            RomanTexts[this.text],
+            RomanMonths[this.month],
+            germanYear,
+            this.calendar);
+
+        return createDate(germanYear, date.month, date.day, this.calendar);
+    }
 }
 
 function fromRomanNumber(value: string) {
@@ -105,10 +123,10 @@ function fromRomanNumber(value: string) {
     return result;
 }
 
-function germanCalendar(romanDay: number, romanText: number, romanMonth: number, year: number) {
-    let leapYear = isLeapYear(year);
+function germanCalendar(romanDay: number, romanText: number, romanMonth: number, year: number, calendar: Calendar) {
+    let leapYear = isLeapYear(year, calendar);
 
-    if ((romanText == 1) && (romanMonth == 3) && leapYear) {
+    if (romanText == 1 && romanMonth == 3 && leapYear) {
         romanDay--;
         if (romanDay == 1) {
             return { day: 29, month: 2 };
@@ -172,32 +190,13 @@ function germanCalendar(romanDay: number, romanText: number, romanMonth: number,
     }
 }
 
-function romanCalendar(day: number, month: number, year: number) {
-    let leapYear = isLeapYear(year);
+function romanCalendar(date: HistoricalDate) {
+    let day = date.day;
 
-    if ((day > 29) && (month == 2)) {
-        throw new InvalidDateException();
-    }
-    else if ((day > 28) && (month == 2) && !leapYear) {
-        throw new InvalidDateException();
-    }
-    else if ((day > 30) && ((month == 4) || (month == 6) || (month == 9) || (month == 11))) {
-        throw new InvalidDateException();
-    }
-    else if ((day > 31) && ((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 10) || (month == 12))) {
-        throw new InvalidDateException();
-    }
-    else if ((month < 1) || (month > 12)) {
-        throw new InvalidDateException();
-    }
-    else if (day < 1) {
-        throw new InvalidDateException();
-    }
-
-    if ((day >= 15) && (month == 2) && leapYear) {
+    if ((day >= 15) && (date.month == 2) && date.isLeapYear) {
         day--;
     }
-    else if ((day == 14) && (month == 2) && leapYear) {
+    else if ((day == 14) && (date.month == 2) && date.isLeapYear) {
         return {
             romanDay: 'a.d.XVII.' as RomanDay,
             romanText: 'Kal.' as RomanText,
@@ -207,13 +206,13 @@ function romanCalendar(day: number, month: number, year: number) {
     }
 
     let monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    let text = 0;
+    let text: 0 | 1 | 2 = 0;
     let beforeText = 0;
     let textDay = day;
-    let romanMonth = month;
+    let romanMonth = date.month;
 
     if (textDay == 1) {
-        textDay = monthDays[month - 1] + 1;
+        textDay = monthDays[date.month - 1] + 1;
     }
 
     if ((romanMonth == 3) || (romanMonth == 5) || (romanMonth == 7) || (romanMonth == 10)) {
@@ -237,7 +236,7 @@ function romanCalendar(day: number, month: number, year: number) {
     }
 
     // how many days before the Kal. Id. or Non.?
-    beforeText = monthDays[month - 1] + 2 - textDay;
+    beforeText = monthDays[date.month - 1] + 2 - textDay;
 
     let romanDay: RomanDay, romanText: RomanText, romanMonthName: RomanMonth;
 
@@ -254,24 +253,28 @@ function romanCalendar(day: number, month: number, year: number) {
         romanDay = `a.d.${toRomanNumber(beforeText)}.` as RomanDay;
     }
 
-    if (text == 0) {
-        romanText = "Kal.";
-        romanMonth++;
-        if (romanMonth == 13) {
-            romanMonth = 1;
-        }
-    }
-    else if (text == 1) {
-        romanText = "Id.";
-    }
-    else if (text == 2) {
-        romanText = "Non.";
+    switch (text) {
+        case 0:
+            romanText = "Kal.";
+            romanMonth++;
+            if (romanMonth == 13) {
+                romanMonth = 1;
+            }
+            break;
+        case 1:
+            romanText = "Id.";
+            break;
+        case 2:
+            romanText = "Non.";
+            break;
+        default:
+            throw new InvalidDateException(`Unhandled text type ${text}`);
     }
 
     const monthNames: RomanMonth[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
     romanMonthName = monthNames[romanMonth - 1];
 
-    return { romanDay, romanText, romanMonth, romanMonthName };
+    return { romanDay, romanText, romanMonthName };
 }
 
 function toRomanNumber($year: number) {
@@ -284,20 +287,4 @@ function toRomanNumber($year: number) {
     let $H = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"];
     let $T = ["", "M", "MM", "MMM"];
     return $T[$t] + $H[$h] + $Z[$z] + $E[$e];
-}
-
-export class RomanDate {
-    constructor(public day: RomanDay,
-        public text: RomanText,
-        public month: RomanMonth,
-        public year: string) {
-    }
-
-    toString() {
-        return `${this.day}${this.text}${this.month} ${this.year}`;
-    }
-}
-
-export class InvalidDateException {
-
 }

@@ -1,4 +1,5 @@
-import { fromRoman, toRoman, RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
+import { RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
+import { createDate, Calendar } from './common';
 describe('Roman', () => {
     it('Converts Roman dates', () => {
         expectRoman(5, 6, 2018, '', 'Non.', 'Jun.', 'MMXVIII');
@@ -14,17 +15,22 @@ describe('Roman', () => {
     });
 
     it('Converts and reverts all dates', () => {
+        allDates('gregorian');
+        allDates('julian');
+    });
+
+    function allDates(calendar: Calendar) {
         let today = new Date();
         let date = new Date(1400, 1, 1);
         while (date < today) {
             let year = date.getFullYear();
             let month = date.getMonth() + 1;
             let day = date.getDate();
-            let roman: RomanDate = null;
+            let roman: RomanDate | null = null;
             try {
                 roman = null;
-                roman = toRoman(day, month, year);
-                let back = fromRoman(roman.day, roman.text, roman.month, roman.year);
+                roman = RomanDate.fromDate(createDate(year, month, day, calendar));
+                let back = roman.toDate();
 
                 let fromString = `${day}-${month}-${year}`;
                 let backString = `${back.day}-${back.month}-${back.year}`;
@@ -44,7 +50,7 @@ describe('Roman', () => {
             let next = date.getDate() + 1;
             date.setDate(next);
         }
-    });
+    }
 
     function expectRoman<T>(day: number,
         month: number,
@@ -55,12 +61,12 @@ describe('Roman', () => {
         romanYear: string) {
         let expected = `${romanDay}${romanText}${romanMonth} ${romanYear}`;
 
-        expect(toRoman(day, month, year).toString()).toEqual(expected);
-        let from = fromRoman(
+        expect(RomanDate.fromDate(createDate(year, month, day)).toString()).toEqual(expected);
+        let from = new RomanDate(
             romanDay,
             romanText,
             romanMonth,
-            romanYear);
+            romanYear).toDate();
         expect(`${from.day}-${from.month}-${from.year}`)
             .toEqual(`${day}-${month}-${year}`);
     }
