@@ -90,6 +90,9 @@ function getEasterDay(year: number, calendar: Calendar) {
     };
 }
 
+/**
+ * Computus is a calculation that determines the calendar date of Easter.
+ */
 function computus(year: number, calendar: Calendar) {
     let m: number, q: number;
     let h1 = floor(year / 100);

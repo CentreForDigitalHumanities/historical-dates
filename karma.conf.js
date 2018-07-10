@@ -11,7 +11,6 @@ module.exports = function (config) {
             'src/**/*.+(js|ts)': ['karma-typescript']
         },
         reporters: ['progress', 'karma-typescript'],
-        browsers: ['PhantomJS'],
         autoWatch: false,
         singleRun: true,
         plugins: [

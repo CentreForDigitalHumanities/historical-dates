@@ -1,14 +1,15 @@
-[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=master)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
-
 # Historical Dates
+
+Master: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=master)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
+Develop: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
 
 JavaScript/TypeScript library for converting/calculating Roman and Easter dates. Based on [Axel Findling's Roman date converter](http://cgi.axel-findling.de/cgi-bin/romdat) and [Nikolaus A. Bär's easter date calculator](http://www.nabkal.de/ostrech1.html).
 
 <div class="center">
-<blockquote class="twitter-tweet" data-lang="nl"><p lang="en" dir="ltr">Friend: Do dates make you nervous?<br>Me: omg yes especially when doing math across timezone boundaries</p>&mdash; Yak Painter (@dcousineau) <a href="https://twitter.com/dcousineau/status/760848423268519936?ref_src=twsrc%5Etfw">3 augustus 2016</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Friend: Do dates make you nervous?<br>Me: omg yes especially when doing math across timezone boundaries</p>&mdash; Daniel Cousineau (@dcousineau) <a href="https://twitter.com/dcousineau/status/760848423268519936?ref_src=twsrc%5Etfw">August 3, 2016</a></blockquote>
 </div>
 
-## Determining Easter dates
+## Determining the dates of Easter
 
 ```typescript
 import { calcEaster } from 'historical-dates';
