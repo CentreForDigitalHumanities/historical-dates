@@ -21,7 +21,10 @@ export function calcEaster(year: number, calendar: Calendar = 'gregorian') {
     let jd = easterDay.jd;
 
     return {
-        easterSunday: makeDate(jd, calendar),
+        /**
+         * Easter Sunday.
+         */
+        sunday: makeDate(jd, calendar),
         /**
          * Ninth Sunday before Easter.
          */

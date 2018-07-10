@@ -1,5 +1,6 @@
+import { createDate, Calendar, InvalidDateException } from './common';
 import { RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
-import { createDate, Calendar } from './common';
+
 describe('Roman', () => {
     it('Converts Roman dates', () => {
         expectRoman(5, 6, 2018, '', 'Non.', 'Jun.', 'MMXVIII');
@@ -15,17 +16,7 @@ describe('Roman', () => {
     });
 
     it('Converts and reverts all dates', () => {
-        allDates('gregorian');
-        allDates('julian');
-    });
-
-    function allDates(calendar: Calendar) {
-        let today = new Date();
-        let date = new Date(1400, 1, 1);
-        while (date < today) {
-            let year = date.getFullYear();
-            let month = date.getMonth() + 1;
-            let day = date.getDate();
+        let action = (year: number, month: number, day: number, calendar: Calendar) => {
             let roman: RomanDate | null = null;
             try {
                 roman = null;
@@ -42,6 +33,43 @@ describe('Roman', () => {
                 if (roman != null) {
                     console.log(roman.toString());
                 }
+                throw error;
+            }
+        };
+
+        allDates('gregorian', action);
+        allDates('julian', action);
+    });
+
+    it('Parses string', () => {
+        expectRomanParse('a.d.XV. Kal. Apr. MDCXXXIV', 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
+        expectRomanParse('ad.xv.cal. apr  MDCXXXIV', 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
+        expectRomanParse('prid Kal. mar MDC', 'pr.', 'Kal.', 'Mart.', 'MDC');
+        expectRomanParse('a.d. IV. eid. dec md cccxv ', 'a.d.IV.', 'Id.', 'Dec.', 'MDCCCXV');
+    });
+
+    it('Converts to and from string', () => {
+        let action = (year: number, month: number, day: number, calendar: Calendar) => {
+            let romanDate = RomanDate.fromDate(createDate(year, month, day, calendar));
+            let text = romanDate.toString();
+            expect(text).toEqual(RomanDate.fromString(text, calendar).toString());
+        };
+        allDates('gregorian', action);
+        allDates('julian', action);
+    });
+
+    function allDates(calendar: Calendar,
+        action: (year: number, month: number, day: number, calendar: Calendar) => void) {
+        let today = new Date();
+        let date = new Date(1400, 1, 1);
+        while (date < today) {
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+
+            try {
+                action(year, month, day, calendar);
+            } catch (error) {
                 console.log(`${day}-${month}-${year}`);
                 console.log(error);
                 throw error;
@@ -52,7 +80,27 @@ describe('Roman', () => {
         }
     }
 
-    function expectRoman<T>(day: number,
+    function expectRomanParse(string: string,
+        romanDay: RomanDay,
+        romanText: RomanText,
+        romanMonth: RomanMonth,
+        romanYear: string) {
+        try {
+            let expected = `${romanDay}${romanText}${romanMonth} ${romanYear}`;
+            let parsed = RomanDate.fromString(string, 'julian');
+            expect(parsed.toString()).toEqual(expected);
+
+            parsed = RomanDate.fromString(string, 'gregorian');
+            expect(parsed.toString()).toEqual(expected);
+        } catch (error) {
+            if (error instanceof InvalidDateException) {
+                console.error(error.message);
+            }
+            throw error;
+        }
+    }
+
+    function expectRoman(day: number,
         month: number,
         year: number,
         romanDay: RomanDay,

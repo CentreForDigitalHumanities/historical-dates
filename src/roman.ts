@@ -41,9 +41,66 @@ export const RomanDays = {
 };
 export const RomanTexts = { "Kal.": 1, "Non.": 2, "Id.": 3 };
 
+const RomanMonthPatterns: [RegExp, RomanMonth][] = [
+    [/^[ij]an\.?/i, 'Ian.'],
+    [/^feb\.?/i, 'Feb.'],
+    [/^mart?\.?/i, 'Mart.'],
+    [/^apr\.?/i, 'Apr.'],
+    [/^ma[ij]\.?/i, 'Mai.'],
+    [/^[ij]un\.?/i, 'Jun.'],
+    [/^[ij]ul\.?/i, 'Jul.'],
+    [/^se[cxk]t?\.?/i, 'Sext.'],
+    [/^sept?\.?/i, 'Sept.'],
+    [/^o[ck]t\.?/i, 'Oct.'],
+    [/^nov\.?/i, 'Nov.'],
+    [/^de[ck]\.?/i, 'Dec.']];
+
+const RomanDayPatterns: [RegExp, RomanDay][] = [
+    [/^\.*/, ''],
+    [/^pri?d?\.?/i, 'pr.'],
+    [/^a\.?d\.? ?iii\.?/i, 'a.d.III.'],
+    [/^a\.?d\.? ?iv\.?/i, 'a.d.IV.'],
+    [/^a\.?d\.? ?v\.?/i, 'a.d.V.'],
+    [/^a\.?d\.? ?vi\.?/i, 'a.d.VI.'],
+    [/^a\.?d\.? ?vii\.?/i, 'a.d.VII.'],
+    [/^a\.?d\.? ?viii\.?/i, 'a.d.VIII.'],
+    [/^a\.?d\.? ?ix\.?/i, 'a.d.IX.'],
+    [/^a\.?d\.? ?x\.?/i, 'a.d.X.'],
+    [/^a\.?d\.? ?xi\.?/i, 'a.d.XI.'],
+    [/^a\.?d\.? ?xii\.?/i, 'a.d.XII.'],
+    [/^a\.?d\.? ?xiii\.?/i, 'a.d.XIII.'],
+    [/^a\.?d\.? ?xiv\.?/i, 'a.d.XIV.'],
+    [/^a\.?d\.? ?xv\.?/i, 'a.d.XV.'],
+    [/^a\.?d\.? ?xvi\.?/i, 'a.d.XVI.'],
+    [/^a\.?d\.? ?xvii\.?/i, 'a.d.XVII.'],
+    [/^a\.?d\.? ?xviii\.?/i, 'a.d.XVIII.'],
+    [/^a\.?d\.? ?xix\.?/i, 'a.d.XIX.']
+];
+
+const RomanTextPatterns: [RegExp, RomanText][] = [
+    [/^[ck]al\.?/i, 'Kal.'],
+    [/^non\.?/i, 'Non.'],
+    [/^e?id\.?/i, 'Id.']
+];
+
 export type RomanMonth = keyof typeof RomanMonths;
 export type RomanDay = keyof typeof RomanDays;
 export type RomanText = keyof typeof RomanTexts;
+
+function matchBiggest<T>(text: string, patterns: [RegExp, T][]) {
+    let candidateText = '';
+    let candidate: T | null = null;
+
+    for (let [pattern, key] of patterns) {
+        let match = text.match(pattern);
+        if (match && match[0].length >= candidateText.length) {
+            candidateText = match[0];
+            candidate = key;
+        }
+    }
+
+    return { text: candidate, length: candidateText.length };
+}
 
 export class RomanDate {
     constructor(public day: RomanDay,
@@ -58,6 +115,34 @@ export class RomanDate {
         let romanYear = toRomanNumber(date.year);
 
         return new RomanDate(romanDay, romanText, romanMonthName, romanYear, date.calendar);
+    }
+
+    static fromString(string: string, calendar: Calendar = 'gregorian') {
+        let romanDay = matchBiggest(string, RomanDayPatterns);
+
+        if (romanDay.text == null) {
+            throw new InvalidDateException(`No day found in ${string}`);
+        }
+
+        let remainder = string.substring(romanDay.length).trimLeft();
+        let romanText = matchBiggest(remainder, RomanTextPatterns);
+
+        if (romanText.text == null) {
+            throw new InvalidDateException(`No text part found in ${string} (${remainder}; ${romanDay.text})`);
+        }
+
+        remainder = remainder.substring(romanText.length).trimLeft();
+        let romanMonth = matchBiggest(remainder, RomanMonthPatterns);
+
+        if (romanMonth.text == null) {
+            throw new InvalidDateException(`No month found in ${string} (${remainder})`);
+        }
+        
+        let romanYear = remainder.substring(romanMonth.length).replace(/\s/g, '').toUpperCase();
+        // normalize it and check validity
+        romanYear = toRomanNumber(fromRomanNumber(romanYear));
+
+        return new RomanDate(romanDay.text, romanText.text, romanMonth.text, romanYear, calendar);
     }
 
     toString() {
@@ -117,7 +202,7 @@ function fromRomanNumber(value: string) {
     else if (value.substr(index, 1) == "I") { result += 1; index += 1; }
 
     if (index != value.length) {
-        throw new InvalidDateException();
+        throw new InvalidDateException(`${value} is not a valid Roman number`);
     }
 
     return result;

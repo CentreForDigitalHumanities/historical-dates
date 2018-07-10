@@ -1,4 +1,4 @@
-import { isLeapYear, InvalidDateException } from "./common";
+import { isLeapYear, InvalidDateException, IHistoricalDate } from "./common";
 
 // Licensed under the MIT license:
 // http://opensource.org/licenses/MIT
@@ -20,7 +20,7 @@ const YEAR_DAYS = 365;
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 
-export class GregorianDate {
+export class GregorianDate implements IHistoricalDate {
     public readonly calendar = 'gregorian';
     public get isLeapYear() {
         return isLeapYear(this.year, this.calendar);
@@ -73,6 +73,13 @@ export class GregorianDate {
         return new GregorianDate(year, month, day);
     }
 
+    public toGregorian() {
+        return this;
+    }
+
+    public toString() {
+        return `${this.year}-${this.month}-${this.day}`;
+    }
 }
 
 /**
@@ -123,7 +130,7 @@ function toJulianDays(year: number, month: number, day: number) {
  * Check if this is a legal date in the Gregorian calendar
  */
 function assertLegalDate(year: number, month: number, day: number) {
-    let daysInMonth;
+    let daysInMonth: number;
     if (month == 2) {
         daysInMonth = isLeapYear(year) ? 29 : 28;
     } else {
