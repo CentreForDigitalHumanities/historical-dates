@@ -54,12 +54,13 @@ describe('Roman', () => {
             let text = romanDate.toString();
             expect(text).toEqual(RomanDate.fromString(text, calendar).toString());
         };
-        allDates('gregorian', action);
-        allDates('julian', action);
+        allDates('gregorian', action, 131);
+        allDates('julian', action, 131);
     });
 
     function allDates(calendar: Calendar,
-        action: (year: number, month: number, day: number, calendar: Calendar) => void) {
+        action: (year: number, month: number, day: number, calendar: Calendar) => void,
+        speedup = 1) {
         let today = new Date();
         let date = new Date(1400, 1, 1);
         while (date < today) {
@@ -75,7 +76,7 @@ describe('Roman', () => {
                 throw error;
             }
 
-            let next = date.getDate() + 1;
+            let next = date.getDate() + speedup;
             date.setDate(next);
         }
     }
