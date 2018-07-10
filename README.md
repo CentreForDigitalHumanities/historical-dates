@@ -8,7 +8,7 @@ JavaScript/TypeScript library for converting/calculating Roman and Easter dates.
 <blockquote class="twitter-tweet" data-lang="nl"><p lang="en" dir="ltr">Friend: Do dates make you nervous?<br>Me: omg yes especially when doing math across timezone boundaries</p>&mdash; Yak Painter (@dcousineau) <a href="https://twitter.com/dcousineau/status/760848423268519936?ref_src=twsrc%5Etfw">3 augustus 2016</a></blockquote>
 </div>
 
-# Determining Easter dates
+## Determining Easter dates
 
 ```typescript
 import { calcEaster } from 'historical-dates';
@@ -18,7 +18,7 @@ console.log(easter.sunday);
 // 1400-4-18 (Julian)
 ```
 
-# Parsing Roman dates
+## Parsing Roman dates
 
 ```typescript
 import { RomanDate } from 'historical-dates';
@@ -30,7 +30,7 @@ console.log(romanDate.toDate());
 // 1600-2-28
 ```
 
-# Converting Julian and Gregorian dates
+## Converting Julian and Gregorian dates
 
 ```typescript
 import { createDate } from 'historical-dates';
