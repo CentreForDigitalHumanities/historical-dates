@@ -6,7 +6,7 @@ import { GregorianDate } from "./gregorian-date";
 // Licensed under the MIT license:
 // http://opensource.org/licenses/MIT
 // Copyright (c) 2016, fitnr <fitnr@fakeisthenewreal>
-// based on https://github.com/fitnr/convertdate/blob/master/convertdate/julian.py
+// based on https://github.com/fitnr/convertdate/blob/5a1d1323c34670c5e179900d8770db59c009e679/convertdate/julian.py
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 

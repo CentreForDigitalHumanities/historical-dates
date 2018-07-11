@@ -16,7 +16,6 @@ module.exports = function (config) {
         plugins: [
             'karma-chrome-launcher',
             'karma-jasmine',
-            'karma-phantomjs-launcher',
             'karma-typescript'
         ],
         karmaTypescriptConfig: {
