@@ -42,10 +42,8 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-typescript": "^3.0.8",
     "phantomjs-prebuilt": "^2.1.7",
+    "typescript": "^2.6.1",
     "ts-loader": "^3.1.1",
     "webpack": "^3.8.1"
-  },
-  "dependencies": {
-    "typescript": "^2.6.1"
   }
 }
