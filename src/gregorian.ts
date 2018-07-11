@@ -1,9 +1,10 @@
 import { isLeapYear, InvalidDateException, IHistoricalDate } from "./common";
+import { JulianDate } from "./julian";
 
 // Licensed under the MIT license:
 // http://opensource.org/licenses/MIT
 // Copyright (c) 2016, fitnr <fitnr@fakeisthenewreal>
-// based on fitnr/gregorian.py
+// based on https://github.com/fitnr/convertdate/blob/master/convertdate/gregorian.py
 
 const EPOCH = 1721425.5;
 
@@ -53,12 +54,12 @@ export class GregorianDate implements IHistoricalDate {
         if (cent != 4 && yindex != 4) {
             year += 1;
         }
-        
+
         let yearDay = wjd - GregorianDate.toJulianDays(year, 1, 1);
 
         let leap = isLeapYear(year);
         let leapAdj: number;
-        if (yearDay < 58 && leap) {
+        if (yearDay < (58 + (leap ? 1 : 0))) {
             leapAdj = 0;
         } else if (leap) {
             leapAdj = 1;
@@ -74,6 +75,10 @@ export class GregorianDate implements IHistoricalDate {
 
     public toGregorian() {
         return this;
+    }
+
+    public toJulian() {
+        return JulianDate.fromJulianDays(this.toJulianDays());
     }
 
     public toString() {
@@ -119,6 +124,10 @@ export class GregorianDate implements IHistoricalDate {
             (-Math.floor((year - 1) / LEAP_SUPPRESSION_YEARS)) +
             Math.floor((year - 1) / INTERCALATION_CYCLE_YEARS) +
             Math.floor((((367 * month) - 362) / 12) + leapAdj + day);
+    }
+
+    private toJulianDays() {
+        return GregorianDate.toJulianDays(this.year, this.month, this.day);
     }
 
     /**

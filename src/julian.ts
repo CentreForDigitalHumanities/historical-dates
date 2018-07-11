@@ -4,7 +4,7 @@ import { GregorianDate } from "./gregorian";
 // Licensed under the MIT license:
 // http://opensource.org/licenses/MIT
 // Copyright (c) 2016, fitnr <fitnr@fakeisthenewreal>
-// based on fitnr/julian.py
+// based on https://github.com/fitnr/convertdate/blob/master/convertdate/julian.py
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 
@@ -18,6 +18,37 @@ export class JulianDate implements IHistoricalDate {
         public readonly month: number,
         public readonly day: number) {
         this.assertLegalDate(year, month, day);
+    }
+
+    /**
+     * Creates a new JulianDate object based on the number of Julian days.
+     * @param jd 
+     */
+    static fromJulianDays(jd: number) {
+        jd += 0.5;
+        let z = Math.trunc(jd);
+
+        let a = z;
+        let b = a + 1524;
+        let c = Math.trunc((b - 122.1) / 365.25);
+        let d = Math.trunc(365.25 * c);
+        let e = Math.trunc((b - d) / 30.6001);
+
+        let month: number;
+        if (e < 14) {
+            month = e - 1;
+        } else {
+            month = e - 13;
+        }
+        let year: number;
+        if (month > 2) {
+            year = c - 4716;
+        } else {
+            year = c - 4715;
+        }
+        let day = b - d - Math.trunc(30.6001 * e);
+
+        return new JulianDate(year, month, day);
     }
 
     /**
@@ -36,7 +67,6 @@ export class JulianDate implements IHistoricalDate {
      */
     private toJulianDay(year: number, month: number, day: number) {
         // Algorithm as given in Meeus, Astronomical Algorithms, Chapter 7, page 61
-
         if (month <= 2) {
             year -= 1;
             month += 12;
@@ -52,7 +82,12 @@ export class JulianDate implements IHistoricalDate {
     }
 
     public toGregorian() {
-        return GregorianDate.fromJulianDays(this.toJulianDay(this.year, this.month, this.day));
+        let julianDays = this.toJulianDay(this.year, this.month, this.day);
+        return GregorianDate.fromJulianDays(julianDays);
+    }
+
+    public toJulian() {
+        return this;
     }
 
     public toString() {

@@ -20,7 +20,8 @@ export interface IHistoricalDate {
     month: number;
     day: number;
     readonly isLeapYear: boolean,
-    toGregorian(): GregorianDate
+    toGregorian(): GregorianDate,
+    toJulian(): JulianDate
 };
 export type HistoricalDate = JulianDate | GregorianDate;
 
