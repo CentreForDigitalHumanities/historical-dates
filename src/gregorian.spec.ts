@@ -1,5 +1,4 @@
 import { createDate } from "./common";
-import { GregorianDate } from "./gregorian";
 
 describe('Gregorian dates', () => {
     it('Converts dates to Julian as expected', () => {
