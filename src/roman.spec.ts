@@ -1,4 +1,6 @@
-import { createDate, Calendar, InvalidDateException } from './common';
+import { Calendar } from './calendar';
+import { createDate } from './common';
+import { InvalidDateException } from './invalid-date-exception';
 import { RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
 
 describe('Roman', () => {

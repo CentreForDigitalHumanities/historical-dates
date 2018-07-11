@@ -3,7 +3,8 @@
  * Originally written by Nikolaus A. Bär.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-import { Calendar, createDate } from './common';
+import { Calendar } from './calendar';
+import { createDate } from './common';
 
 type DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];
 const DominicalLetters: DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];

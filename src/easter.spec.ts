@@ -1,5 +1,5 @@
 import { calcEaster } from './easter';
-import { Calendar } from './common';
+import { Calendar } from './calendar';
 
 describe('Easter', () => {
     it('Calculates Julian style correctly', () => {

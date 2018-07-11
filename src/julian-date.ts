@@ -1,5 +1,7 @@
-import { isLeapYear, IHistoricalDate, InvalidDateException } from "./common";
-import { GregorianDate } from "./gregorian";
+import { isLeapYear } from "./common";
+import { HistoricalDate } from './historical-date';
+import { InvalidDateException } from './invalid-date-exception';
+import { GregorianDate } from "./gregorian-date";
 
 // Licensed under the MIT license:
 // http://opensource.org/licenses/MIT
@@ -8,8 +10,7 @@ import { GregorianDate } from "./gregorian";
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 
-export class JulianDate implements IHistoricalDate {
-    public readonly calendar = 'julian';
+export class JulianDate extends HistoricalDate<'julian'> {
     public get isLeapYear() {
         return isLeapYear(this.year, this.calendar);
     }
@@ -17,6 +18,7 @@ export class JulianDate implements IHistoricalDate {
     constructor(public readonly year: number,
         public readonly month: number,
         public readonly day: number) {
+        super('julian');
         this.assertLegalDate(year, month, day);
     }
 
@@ -75,7 +77,7 @@ export class JulianDate implements IHistoricalDate {
         return (Math.trunc((365.25 * (year + 4716))) + Math.trunc((30.6001 * (month + 1))) + day) - 1524.5
     }
 
-    public monthLength(year: number, month: number) {
+    private monthLength(year: number, month: number) {
         return month == 2
             ? isLeapYear(year, 'julian') ? 29 : 28
             : HAVE_30_DAYS.indexOf(month) >= 0 ? 30 : 31;

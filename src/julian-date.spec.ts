@@ -1,4 +1,4 @@
-import { JulianDate } from "./julian";
+import { JulianDate } from "./julian-date";
 
 describe('Julian dates', () => {
     it('Converts dates to Gregorian as expected', () => {

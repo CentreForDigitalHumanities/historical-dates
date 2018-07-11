@@ -1,11 +1,6 @@
-import { JulianDate } from "./julian";
-import { GregorianDate } from "./gregorian";
-
-export class InvalidDateException {
-    constructor(public message: string | null = null) { }
-}
-
-export type Calendar = HistoricalDate['calendar'];
+import { Calendar } from './calendar';
+import { JulianDate } from "./julian-date";
+import { GregorianDate } from "./gregorian-date";
 
 export function isLeapYear(year: number, calendar: Calendar = 'gregorian') {
     if (calendar == 'gregorian') {
@@ -14,16 +9,6 @@ export function isLeapYear(year: number, calendar: Calendar = 'gregorian') {
         return year % 4 === 0 || year <= 0;
     }
 }
-
-export interface IHistoricalDate {
-    year: number;
-    month: number;
-    day: number;
-    readonly isLeapYear: boolean,
-    toGregorian(): GregorianDate,
-    toJulian(): JulianDate
-};
-export type HistoricalDate = JulianDate | GregorianDate;
 
 export function createDate(year: number, month: number, day: number, calendar: Calendar = 'gregorian') {
     switch (calendar) {

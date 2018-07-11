@@ -3,7 +3,11 @@
  * Originally written by Axel Findling.
  * Modified by Sheean Spoel, Digital Humanities Lab, Utrecht University.
  */
-import { isLeapYear, Calendar, InvalidDateException, createDate, HistoricalDate } from './common';
+import { Calendar } from './calendar';
+import { isLeapYear, createDate } from './common';
+import { InvalidDateException } from './invalid-date-exception';
+import { HistoricalDate } from './historical-date';
+
 export const RomanMonths = {
     "Ian.": 1,
     "Feb.": 2,
@@ -137,7 +141,7 @@ export class RomanDate {
         if (romanMonth.text == null) {
             throw new InvalidDateException(`No month found in ${string} (${remainder})`);
         }
-        
+
         let romanYear = remainder.substring(romanMonth.length).replace(/\s/g, '').toUpperCase();
         // normalize it and check validity
         romanYear = toRomanNumber(fromRomanNumber(romanYear));
@@ -245,7 +249,7 @@ function germanCalendar(romanDay: number, romanText: number, romanMonth: number,
                 month = romanMonth == 1 ? 12 : romanMonth - 1;
 
                 let kal: number;
-                if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
+                if (month == 4 || month == 6 || month == 9 || month == 11) {
                     kal = 32;
                 }
                 else if (month == 2) {
