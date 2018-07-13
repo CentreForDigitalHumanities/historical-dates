@@ -3,8 +3,8 @@ import { Calendar } from './calendar';
 import { JulianDate } from "./julian-date";
 import { GregorianDate } from "./gregorian-date";
 
-export abstract class HistoricalDate<T = Calendar> {
-    constructor(public readonly calendar: T) { }
+export abstract class HistoricalDate {
+    constructor(public readonly calendar: Calendar) { }
 
     abstract year: number;
     abstract month: number;

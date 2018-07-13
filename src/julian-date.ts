@@ -10,7 +10,7 @@ import { GregorianDate } from "./gregorian-date";
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 
-export class JulianDate extends HistoricalDate<'julian'> {
+export class JulianDate extends HistoricalDate {
     public get isLeapYear() {
         return isLeapYear(this.year, this.calendar);
     }

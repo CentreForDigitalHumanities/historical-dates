@@ -23,7 +23,7 @@ const YEAR_DAYS = 365;
 
 const HAVE_30_DAYS = [4, 6, 9, 11];
 
-export class GregorianDate extends HistoricalDate<'gregorian'> {
+export class GregorianDate extends HistoricalDate {
     public get isLeapYear() {
         return isLeapYear(this.year, this.calendar);
     }
