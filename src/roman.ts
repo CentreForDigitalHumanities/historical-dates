@@ -366,14 +366,13 @@ function romanCalendar(date: HistoricalDate) {
     return { romanDay, romanText, romanMonthName };
 }
 
-function toRomanNumber($year: number) {
-    let $t = ($year - $year % 1000) / 1000;
-    let $h = (($year - $year % 100) / 100) - ($t * 10);
-    let $z = (($year - $year % 10) / 10) - ($t * 100 + $h * 10);
-    let $e = $year - ($t * 1000 + $h * 100 + $z * 10);
-    let $E = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
-    let $Z = ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"];
-    let $H = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"];
-    let $T = ["", "M", "MM", "MMM"];
-    return $T[$t] + $H[$h] + $Z[$z] + $E[$e];
+function toRomanNumber(value: number) {
+    let thousand = (value - value % 1000) / 1000;
+    let hundred = ((value - value % 100) / 100) - (thousand * 10);
+    let decimal = ((value - value % 10) / 10) - (thousand * 100 + hundred * 10);
+    let digit = value - (thousand * 1000 + hundred * 100 + decimal * 10);
+    return ["", "M", "MM", "MMM"][thousand] +
+        ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"][hundred] +
+        ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"][decimal] +
+        ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"][digit];
 }
