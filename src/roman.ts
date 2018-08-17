@@ -167,7 +167,7 @@ export class RomanDate {
     }
 }
 
-function fromRomanNumber(value: string) {
+export function fromRomanNumber(value: string) {
     let index = 0;
     let result = 0;
 

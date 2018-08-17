@@ -67,7 +67,9 @@ export class JulianDate extends HistoricalDate {
     /**
      * Convert to Julian day using astronomical years (0 = 1 BC, -1 = 2 BC)
      */
-    private toJulianDay(year: number, month: number, day: number) {
+    private toJulianDays(year: number = this.year,
+        month: number = this.month,
+        day: number = this.day) {
         // Algorithm as given in Meeus, Astronomical Algorithms, Chapter 7, page 61
         if (month <= 2) {
             year -= 1;
@@ -83,8 +85,12 @@ export class JulianDate extends HistoricalDate {
             : HAVE_30_DAYS.indexOf(month) >= 0 ? 30 : 31;
     }
 
+    public addDays(days: number) {
+        return JulianDate.fromJulianDays(this.toJulianDays() + days);
+    }
+
     public toGregorian() {
-        let julianDays = this.toJulianDay(this.year, this.month, this.day);
+        let julianDays = this.toJulianDays();
         return GregorianDate.fromJulianDays(julianDays);
     }
 
