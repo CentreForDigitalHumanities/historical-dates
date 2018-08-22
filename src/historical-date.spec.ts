@@ -25,7 +25,7 @@ describe('Historical dates', () => {
         let nativeDate = historicalDate.toDate();
 
         for (let i = 0; i < 500; i++) {
-            let offset = Math.floor(Math.random() * 500) - 250;
+            let offset = Math.floor(Math.random() * 1000) - 500;
 
             let nextHistorical = historicalDate.addDays(offset);
 
