@@ -366,7 +366,7 @@ function romanCalendar(date: HistoricalDate) {
     return { romanDay, romanText, romanMonthName };
 }
 
-function toRomanNumber(value: number) {
+export function toRomanNumber(value: number) {
     let thousand = (value - value % 1000) / 1000;
     let hundred = ((value - value % 100) / 100) - (thousand * 10);
     let decimal = ((value - value % 10) / 10) - (thousand * 100 + hundred * 10);
