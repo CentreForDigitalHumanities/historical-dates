@@ -5,6 +5,7 @@
  */
 import { Calendar } from './calendar';
 import { createDate } from './common';
+import { fromRomanNumber } from './roman';
 
 type DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];
 const DominicalLetters: DominicalLettersTuple = ["F", "E", "D", "C", "B", "A", "G"];
@@ -14,10 +15,18 @@ const Epacts: EpactsTuple = ["XXIII", "XXII", "XXI", "XX", "XIX", "XVIII", "XVII
 
 /**
  * Calculates the date for Easter and the associated dates.
- * @param year The unabbreviated year number.
+ * @param year The unabbreviated (Roman) year number.
  * @param calendar The calendar style to use.
  */
-export function calcEaster(year: number, calendar: Calendar = 'gregorian') {
+export function calcEaster(year: number | string, calendar: Calendar = 'gregorian') {
+    if (typeof (year) != 'number') {
+        if (/^\d+$/.test(year)) {
+            year = parseInt(year);
+        } else {
+            year = fromRomanNumber(year);
+        }
+    }
+    
     let easterDay = getEasterDay(year, calendar);
     let jd = easterDay.jd;
 
