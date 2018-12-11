@@ -25,6 +25,7 @@ export const RomanMonths = {
 export const RomanDays = {
     "": 1,
     "pr.": 2,
+    "postr.": 0,
     "a.d.III.": 3,
     "a.d.IV.": 4,
     "a.d.V.": 5,
@@ -42,6 +43,10 @@ export const RomanDays = {
     "a.d.XVII.": 17,
     "a.d.XVIII.": 18,
     "a.d.XIX.": 19
+};
+export const RomanDayLong: { [day in RomanDay]?: string } = {
+    'pr.': 'pridie',
+    'postr.': 'postridie'
 };
 export const RomanTexts = { "Kal.": 1, "Non.": 2, "Id.": 3 };
 
@@ -61,7 +66,8 @@ const RomanMonthPatterns: [RegExp, RomanMonth][] = [
 
 const RomanDayPatterns: [RegExp, RomanDay][] = [
     [/^\.*/, ''],
-    [/^pri?d?\.?/i, 'pr.'],
+    [/^pri?d?i?e?\.?/i, 'pr.'],
+    [/^postri?d?i?e?\.?/i, 'postr.'],
     [/^a\.?d\.? ?iii\.?/i, 'a.d.III.'],
     [/^a\.?d\.? ?iv\.?/i, 'a.d.IV.'],
     [/^a\.?d\.? ?v\.?/i, 'a.d.V.'],
@@ -82,9 +88,9 @@ const RomanDayPatterns: [RegExp, RomanDay][] = [
 ];
 
 const RomanTextPatterns: [RegExp, RomanText][] = [
-    [/^[ck]al\.?/i, 'Kal.'],
-    [/^non\.?/i, 'Non.'],
-    [/^e?id\.?/i, 'Id.']
+    [/^[ck]ale?n?d?[ai]?s?\.?/i, 'Kal.'],
+    [/^non[ai]?s?\.?/i, 'Non.'],
+    [/^e?idi?b?u?s?\.?/i, 'Id.']
 ];
 
 export type RomanMonth = keyof typeof RomanMonths;
@@ -150,20 +156,32 @@ export class RomanDate {
     }
 
     toString() {
-        return `${this.day}${this.text}${this.month} ${this.year}`;
+        return [
+            ...(this.day ? [RomanDayLong[this.day] || this.day] : []),
+            this.text,
+            this.month,
+            this.year].join(' ');
     }
 
     toDate() {
         let year = this.year.replace(/[^MDCLXVI]/gi, '').toUpperCase();
         let germanYear = fromRomanNumber(year);
+        let romanDay = RomanDays[this.day];
+        let offset = 0;
+        if (romanDay < 1) {
+            offset = romanDay - 1;
+            romanDay;
+        }
+
         let date = germanCalendar(
-            RomanDays[this.day],
-            RomanTexts[this.text],
+            romanDay,
+            this.text,
             RomanMonths[this.month],
             germanYear,
             this.calendar);
 
-        return createDate(germanYear, date.month, date.day, this.calendar);
+        return createDate(germanYear, date.month, date.day, this.calendar)
+            .addDays(offset);
     }
 }
 
@@ -212,18 +230,13 @@ export function fromRomanNumber(value: string) {
     return result;
 }
 
-function germanCalendar(romanDay: number, romanText: number, romanMonth: number, year: number, calendar: Calendar) {
-    let leapYear = isLeapYear(year, calendar);
-
-    if (romanText == 1 && romanMonth == 3 && leapYear) {
-        romanDay--;
-        if (romanDay == 1) {
+function germanCalendar(romanDay: number, romanText: RomanText, romanMonth: number, year: number, calendar: Calendar) {
+    if (romanText == 'Kal.' && romanMonth == 3 && isLeapYear(year, calendar)) {
+        if (romanDay == 2) {
             return { day: 29, month: 2 };
+        } else if (romanDay > 1) {
+            romanDay--;
         }
-    }
-
-    if (romanDay == 1) {
-        romanDay = 0;
     }
 
     let firstDay = false;
@@ -231,20 +244,19 @@ function germanCalendar(romanDay: number, romanText: number, romanMonth: number,
     let day = 0;
     let month = romanMonth;
 
-    if (daysBefore == 0) {
-        daysBefore = 1;
-        firstDay = romanText == 1;
+    if (daysBefore == 1) {
+        firstDay = romanText == 'Kal.';
     }
 
     if (firstDay) {
         day = 1;
     } else {
-        if (romanText != 1 && (romanMonth == 3 || romanMonth == 5 || romanMonth == 7 || romanMonth == 10)) {
+        if (romanText != 'Kal.' && (romanMonth == 3 || romanMonth == 5 || romanMonth == 7 || romanMonth == 10)) {
             daysBefore = daysBefore - 2;
         }
 
         switch (romanText) {
-            case 1:
+            case 'Kal.':
                 // before the Kalendes
                 month = romanMonth == 1 ? 12 : romanMonth - 1;
 
@@ -260,10 +272,10 @@ function germanCalendar(romanDay: number, romanText: number, romanMonth: number,
                 }
                 day = kal - daysBefore;
                 break;
-            case 2:
+            case 'Non.':
                 day = 6 - daysBefore;
                 break;
-            case 3:
+            case 'Id.':
                 day = 14 - daysBefore;
                 break;
         }

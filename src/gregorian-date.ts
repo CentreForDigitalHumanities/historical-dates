@@ -76,6 +76,7 @@ export class GregorianDate extends HistoricalDate {
     }
 
     public addDays(days: number) {
+        if (days == 0) { return this; }
         return GregorianDate.fromJulianDays(this.toJulianDays() + days);
     }
 

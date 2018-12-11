@@ -1,7 +1,7 @@
 import { Calendar } from './calendar';
 import { createDate } from './common';
 import { InvalidDateException } from './invalid-date-exception';
-import { RomanDay, RomanText, RomanMonth, RomanDate } from './roman';
+import { RomanDay, RomanText, RomanMonth, RomanDate, RomanDayLong } from './roman';
 
 describe('Roman', () => {
     it('Converts Roman dates', () => {
@@ -48,6 +48,8 @@ describe('Roman', () => {
         expectRomanParse('ad.xv.cal. apr  MDCXXXIV', 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
         expectRomanParse('prid Kal. mar MDC', 'pr.', 'Kal.', 'Mart.', 'MDC');
         expectRomanParse('a.d. IV. eid. dec md cccxv ', 'a.d.IV.', 'Id.', 'Dec.', 'MDCCCXV');
+        expectRomanParse('postr nonis. okt m cccxv ', 'postr.', 'Non.', 'Oct.', 'MCCCXV');;
+        expectRomanParse('pridie kalendas nov mdccc xv ', 'pr.', 'Kal.', 'Nov.', 'MDCCCXV');
     });
 
     it('Converts to and from string', () => {
@@ -83,13 +85,24 @@ describe('Roman', () => {
         }
     }
 
+    function getExpectedString(romanDay: RomanDay,
+        romanText: RomanText,
+        romanMonth: RomanMonth,
+        romanYear: string) {
+        return [
+            ...(romanDay ? [RomanDayLong[romanDay] || romanDay] : []),
+            romanText,
+            romanMonth,
+            romanYear].join(' ');
+    }
+
     function expectRomanParse(string: string,
         romanDay: RomanDay,
         romanText: RomanText,
         romanMonth: RomanMonth,
         romanYear: string) {
         try {
-            let expected = `${romanDay}${romanText}${romanMonth} ${romanYear}`;
+            let expected = getExpectedString(romanDay, romanText, romanMonth, romanYear);
             let parsed = RomanDate.fromString(string, 'julian');
             expect(parsed.toString()).toEqual(expected);
 
@@ -110,7 +123,7 @@ describe('Roman', () => {
         romanText: RomanText,
         romanMonth: RomanMonth,
         romanYear: string) {
-        let expected = `${romanDay}${romanText}${romanMonth} ${romanYear}`;
+        let expected = getExpectedString(romanDay, romanText, romanMonth, romanYear);
 
         expect(RomanDate.fromDate(createDate(year, month, day)).toString()).toEqual(expected);
         let from = new RomanDate(

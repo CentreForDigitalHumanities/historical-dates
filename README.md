@@ -32,7 +32,7 @@ import { RomanDate } from 'historical-dates';
 
 let romanDate = RomanDate.fromString('prid kal. mar mdc', 'gregorian');
 console.log(romanDate);
-// pr. Kal. Mart. MDC
+// pridie Kal. Mart. MDC
 console.log(romanDate.toDate());
 // 1600-2-28
 ```

@@ -86,6 +86,7 @@ export class JulianDate extends HistoricalDate {
     }
 
     public addDays(days: number) {
+        if (days == 0) { return this; }
         return JulianDate.fromJulianDays(this.toJulianDays() + days);
     }
 
