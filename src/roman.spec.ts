@@ -48,8 +48,15 @@ describe('Roman', () => {
         expectRomanParse('ad.xv.cal. apr  MDCXXXIV', 'a.d.XV.', 'Kal.', 'Apr.', 'MDCXXXIV');
         expectRomanParse('prid Kal. mar MDC', 'pr.', 'Kal.', 'Mart.', 'MDC');
         expectRomanParse('a.d. IV. eid. dec md cccxv ', 'a.d.IV.', 'Id.', 'Dec.', 'MDCCCXV');
-        expectRomanParse('postr nonis. okt m cccxv ', 'postr.', 'Non.', 'Oct.', 'MCCCXV');;
+        expectRomanParse('postr nonis. okt m cccxv ', 'postr.', 'Non.', 'Oct.', 'MCCCXV');
         expectRomanParse('pridie kalendas nov mdccc xv ', 'pr.', 'Kal.', 'Nov.', 'MDCCCXV');
+        expectRomanParse('post kal. feb mdc', 'postr.', 'Kal.', 'Feb.', 'MDC');
+    });
+
+    it('Parses postr. dates', () => {
+        const date = new RomanDate('postr.', 'Kal.', 'Feb.', 'MDCC');
+        expect(date.toString()).toEqual('postridie Kal. Feb. MDCC');
+        expect(date.toDate().toString()).toEqual('1700-2-2');
     });
 
     it('Converts to and from string', () => {

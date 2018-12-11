@@ -67,7 +67,7 @@ const RomanMonthPatterns: [RegExp, RomanMonth][] = [
 const RomanDayPatterns: [RegExp, RomanDay][] = [
     [/^\.*/, ''],
     [/^pri?d?i?e?\.?/i, 'pr.'],
-    [/^postri?d?i?e?\.?/i, 'postr.'],
+    [/^postr?i?d?i?e?\.?/i, 'postr.'],
     [/^a\.?d\.? ?iii\.?/i, 'a.d.III.'],
     [/^a\.?d\.? ?iv\.?/i, 'a.d.IV.'],
     [/^a\.?d\.? ?v\.?/i, 'a.d.V.'],
@@ -168,9 +168,9 @@ export class RomanDate {
         let germanYear = fromRomanNumber(year);
         let romanDay = RomanDays[this.day];
         let offset = 0;
-        if (romanDay < 1) {
-            offset = romanDay - 1;
-            romanDay;
+        if (this.day == 'postr.') {
+            offset = 1;
+            romanDay = 1;
         }
 
         let date = germanCalendar(
