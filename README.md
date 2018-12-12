@@ -1,5 +1,6 @@
 # Historical Dates
 
+[![NPM](https://img.shields.io/npm/v/historical-dates.svg)](https://www.npmjs.com/package/historical-dates)
 Master: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=master)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
 Develop: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
 
