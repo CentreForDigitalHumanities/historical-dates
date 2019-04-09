@@ -185,7 +185,14 @@ export class RomanDate {
     }
 }
 
-export function fromRomanNumber(value: string) {
+export function fromRomanNumber(text: string) {
+    // clear whitespace
+    const value = `${text}`.replace(/\W/g, '').toUpperCase()
+    // plain number?
+    if (/^\d+$/.test(value)) {
+        return parseInt(value, 10);
+    }
+
     let index = 0;
     let result = 0;
 

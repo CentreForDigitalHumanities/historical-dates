@@ -1,4 +1,4 @@
-import { createDate } from "./common";
+import { createDate, parseDateString } from "./common";
 import { JulianDate } from "./julian-date";
 import { GregorianDate } from "./gregorian-date";
 
@@ -12,4 +12,15 @@ describe('Common', () => {
         expect(julian).toBe(julian.toJulian());
         expect(julian instanceof JulianDate).toBeTruthy();
     });
+
+    it('Parses date strings', () => {
+        expectDateParse('August 27, 1792', 27, 8, 1792);
+        expectDateParse('Oct 15, 92', 15, 10, 92);
+        expectDateParse('26 Dec. 1692', 26, 12, 1692);
+        expectDateParse('XXVI Dec. M DCXCII', 26, 12, 1692);
+    });
+
+    function expectDateParse(text: string, day: number, month: number, year: number) {
+        expect(parseDateString(text)).toEqual({ day, month, year });
+    }
 });
