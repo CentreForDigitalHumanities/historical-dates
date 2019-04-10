@@ -11,7 +11,7 @@ const MonthPatterns: { [date: number]: string } =
     3: '(march|mars|marti[ia]s?|mart?)',
     4: '(a[pv]ril|aprilis|apr)',
     5: '(ma[ijy]|maji)',
-    6: '[ij]ui?n(ias|e|)',
+    6: '[ij]ui?n(ias|ii|e|)',
     7: '([ij]uillet|[ij]ul[iay]s?)',
     8: '(se[cxk]t?|august(us|i|)|ao[uû]s?t|aug)',
     9: 'sep(ti?emb(er|re|r|)|t|)',
@@ -24,13 +24,14 @@ for (let month = 1; month <= 12; month++) {
     CompiledMonthPatterns[month] = new RegExp(`^${MonthPatterns[month]}\.?$`, 'i');
 }
 
-const AnyMonthPattern = `(${Object.keys(MonthPatterns).map((_, index) => MonthPatterns[index + 1]).join('|')}\.?)`;
+const AnyMonthPattern = `(${Object.keys(MonthPatterns).map((_, index) => MonthPatterns[index + 1]).join('|')})\.?`;
 // Roman or Arabic number
 const NumberPattern = '([MDCLXVI]( ?[MDCLXVI])*|[0-9]+)';
 const DateFormats: RegExp[] = [
-    '^(?<month>{month}) (?<day>{day}), (?<year>{year})\.?$',
-    '^(ad|) ?(?<day>{day})[\.,]? ?(?<month>{month})([\. ](ao\.?|a\.?c\.?|anno|an\.? christi|an\.?|) ?| )(?<year>{year})\.?$',
-    '^(le|ce|) ?(?<day>{day})\.? (de |d\'|)(?<month>{month}) (?<year>{year})\.?$',
+    '^(?<month>{month}) (?<day>{day})[\.,] (?<year>{year})\.?$',
+    '^(?<month>{month}) (?<day>{day})(st|nd|rd|th)[,\.]? (?<year>{year})\.?$',
+    '^(ad|) ?(?<day>{day})[\.,]? ?(?<month>{month})[\. ](ao\.?|a\.?c\.?|anno|an\.? christi|an\.?|a\.?|) ?(?<year>{year})\.?$',
+    '^(le|ce|) ?(?<day>{day})\.? (de |d[’\']|)(?<month>{month})(,? l[’\']an|\.?) (?<year>{year})\.?$',
     '^[aàá]? ?(?<day>{day})\.? de (?<month>{month}) del? a[nn̄n̄]*o de (?<year>{year})\.?$'
 ].map((pattern) => XRegExp(pattern.replace('{month}', AnyMonthPattern)
     .replace('{day}', NumberPattern)
