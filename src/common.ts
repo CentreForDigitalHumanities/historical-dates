@@ -6,18 +6,18 @@ import { fromRomanNumber } from './roman';
 
 const MonthPatterns: { [date: number]: string } =
 {
-    1: '[ij]an',
-    2: 'feb',
-    3: 'mart?',
-    4: 'apr',
-    5: 'ma[ij]',
-    6: '[ij]un',
-    7: '[ij]ul',
-    8: 'se[cxk]t?|august',
-    9: 'sept?',
-    10: 'o[ck]t',
-    11: 'nov',
-    12: 'de[ck]',
+    1: '([ij]an(uar(y|ii?)|)|janvier)',
+    2: '(feb(ruar[yi]?|r|)|fevrier)',
+    3: '(march|mars|marti[ia]s?|mart?)',
+    4: '(a[pv]ril|aprilis|apr)',
+    5: '(ma[ijy]|maji)',
+    6: '[ij]ui?n(ias|e|)',
+    7: '([ij]uillet|[ij]ul[iay]s?)',
+    8: '(se[cxk]t?|august(us|i|)|ao[uû]s?t|aug)',
+    9: 'sep(ti?emb(er|re|r|)|t|)',
+    10: 'o[ck]t(ob(er|re|r|)|)',
+    11: 'nov(emb(er|re|ris|r|)|)',
+    12: 'de[ck](emb(er|re|ris|r|)|)',
 }
 let CompiledMonthPatterns: { [date: number]: RegExp } = {}
 for (let month = 1; month <= 12; month++) {
@@ -28,8 +28,10 @@ const AnyMonthPattern = `(${Object.keys(MonthPatterns).map((_, index) => MonthPa
 // Roman or Arabic number
 const NumberPattern = '([MDCLXVI]( ?[MDCLXVI])*|[0-9]+)';
 const DateFormats: RegExp[] = [
-    '^(?<month>{month}) (?<day>{day}), (?<year>{year})$',
-    '^(?<day>{day}) (?<month>{month}) (?<year>{year})$'
+    '^(?<month>{month}) (?<day>{day}), (?<year>{year})\.?$',
+    '^(ad|) ?(?<day>{day})[\.,]? ?(?<month>{month})\.? ?(ao\.?|a\.?c\.?|anno|an\.? christi|an\.?|) ?(?<year>{year})\.?$',
+    '^(le|ce|) ?(?<day>{day})\.? (|de |d\')(?<month>{month}) (?<year>{year})\.?$',
+    '^[aàá]? ?(?<day>{day})\.? de (?<month>{month}) del? a[nn̄n̄]*o de (?<year>{year})\.?$'
 ].map((pattern) => XRegExp(pattern.replace('{month}', AnyMonthPattern)
     .replace('{day}', NumberPattern)
     .replace('{year}', NumberPattern), 'i'));

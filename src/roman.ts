@@ -51,17 +51,17 @@ export const RomanDayLong: { [day in RomanDay]?: string } = {
 export const RomanTexts = { "Kal.": 1, "Non.": 2, "Id.": 3 };
 
 const RomanMonthPatterns: [RegExp, RomanMonth][] = [
-    [/^[ij]an\.?/i, 'Ian.'],
-    [/^feb\.?/i, 'Feb.'],
-    [/^mart?\.?/i, 'Mart.'],
-    [/^apr\.?/i, 'Apr.'],
+    [/^[ij]an(uari[ia]s?|)\.?/i, 'Ian.'],
+    [/^feb(ruari[ia]s?|)\.?/i, 'Feb.'],
+    [/^mar(ti[ia]s?|t|)\.?/i, 'Mart.'],
+    [/^apr(lis?|)\.?/i, 'Apr.'],
     [/^ma[ij]\.?/i, 'Mai.'],
-    [/^[ij]un\.?/i, 'Jun.'],
-    [/^[ij]ul\.?/i, 'Jul.'],
-    [/^se[cxk]t?\.?/i, 'Sext.'],
-    [/^sept?\.?/i, 'Sept.'],
-    [/^o[ck]t\.?/i, 'Oct.'],
-    [/^nov\.?/i, 'Nov.'],
+    [/^[ij]un(i[ia]s?|)\.?/i, 'Jun.'],
+    [/^[ij]ul(i[ia]s?|)\.?/i, 'Jul.'],
+    [/^(se[cxk](til(is|)|t)|augustini)\.?/i, 'Sext.'],
+    [/^sep(tembris|temb|t|)\.?/i, 'Sept.'],
+    [/^o[ck]t(obris|ob|)\.?/i, 'Oct.'],
+    [/^nov(emb|)\.?/i, 'Nov.'],
     [/^de[ck]\.?/i, 'Dec.']];
 
 const RomanDayPatterns: [RegExp, RomanDay][] = [
