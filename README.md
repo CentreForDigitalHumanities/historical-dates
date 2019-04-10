@@ -26,6 +26,18 @@ console.log(easter.sunday);
 // 1400-4-18 (Julian)
 ```
 
+## Parsing Plain dates
+
+Many formats are supported, see the `common.spec.ts` test file for an overview.
+
+```typescript
+import { parseDateString } from 'historical-dates';
+
+let plainDate = parseDateString('XI. Junii Anno MDCXXXVII.', 'gregorian');
+console.log(plainDate);
+// 1637-6-11
+```
+
 ## Parsing Roman dates
 
 ```typescript
