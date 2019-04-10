@@ -18,7 +18,8 @@ describe('Common', () => {
         expectDateParse('Oct 15, 92', 15, 10, 92);
         expectDateParse('26 Dec. 1692', 26, 12, 1692);
         expectDateParse('ce 14. Aoust 1635', 14, 8, 1635);
-        expectDateParse('XXVI Dec. M DCXCII', 26, 12, 1692);
+        expectDateParse('XXVI Dec M DCXCII', 26, 12, 1692);
+        expectDateParse('XXV Nov. M DCXCI', 25, 11, 1691);
         expectDateParse('19. d\'Avril 1619.', 19, 4, 1619);
         expectDateParse('VI. Maji Anno MDCXXXIV.', 6, 5, 1634);
         expectDateParse('20.Jun.Ao.1639', 20, 6, 1639);

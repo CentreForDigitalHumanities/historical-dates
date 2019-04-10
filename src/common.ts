@@ -29,8 +29,8 @@ const AnyMonthPattern = `(${Object.keys(MonthPatterns).map((_, index) => MonthPa
 const NumberPattern = '([MDCLXVI]( ?[MDCLXVI])*|[0-9]+)';
 const DateFormats: RegExp[] = [
     '^(?<month>{month}) (?<day>{day}), (?<year>{year})\.?$',
-    '^(ad|) ?(?<day>{day})[\.,]? ?(?<month>{month})\.? ?(ao\.?|a\.?c\.?|anno|an\.? christi|an\.?|) ?(?<year>{year})\.?$',
-    '^(le|ce|) ?(?<day>{day})\.? (|de |d\')(?<month>{month}) (?<year>{year})\.?$',
+    '^(ad|) ?(?<day>{day})[\.,]? ?(?<month>{month})([\. ](ao\.?|a\.?c\.?|anno|an\.? christi|an\.?|) ?| )(?<year>{year})\.?$',
+    '^(le|ce|) ?(?<day>{day})\.? (de |d\'|)(?<month>{month}) (?<year>{year})\.?$',
     '^[aàá]? ?(?<day>{day})\.? de (?<month>{month}) del? a[nn̄n̄]*o de (?<year>{year})\.?$'
 ].map((pattern) => XRegExp(pattern.replace('{month}', AnyMonthPattern)
     .replace('{day}', NumberPattern)
