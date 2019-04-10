@@ -1,6 +1,6 @@
 {
   "name": "historical-dates",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "JavaScript/TypeScript library for converting/calculating Roman and Easter date",
   "main": "dist/historical-dates.js",
   "types": "dist/historical-dates.d.ts",
