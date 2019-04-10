@@ -53,6 +53,15 @@ export function createDate(year: number, month: number, day: number, calendar: C
     }
 }
 
+export function createDateFromString(text: string, calendar: Calendar = 'gregorian') {
+    switch (calendar) {
+        case 'gregorian':
+            return GregorianDate.fromString(text);
+        case 'julian':
+            return JulianDate.fromString(text);
+    }
+}
+
 export function parseDateString(text: string) {
     for (const format of DateFormats) {
         const match = XRegExp.exec(text, format) as any;
