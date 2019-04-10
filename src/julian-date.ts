@@ -1,4 +1,4 @@
-import { isLeapYear } from "./common";
+import { isLeapYear, parseDateString } from "./common";
 import { HistoricalDate } from './historical-date';
 import { InvalidDateException } from './invalid-date-exception';
 import { GregorianDate } from "./gregorian-date";
@@ -51,6 +51,14 @@ export class JulianDate extends HistoricalDate {
         let day = b - d - Math.trunc(30.6001 * e);
 
         return new JulianDate(year, month, day);
+    }
+    
+    static fromString(text: string) {
+        const parsed = parseDateString(text);
+        if (parsed) {
+            return new JulianDate(parsed.year, parsed.month, parsed.day);
+        }
+        throw new InvalidDateException();
     }
 
     /**
