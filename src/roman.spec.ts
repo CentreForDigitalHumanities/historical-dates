@@ -69,6 +69,16 @@ describe('Roman', () => {
         allDates('julian', action, 131);
     });
 
+    it('Allows partial dates', () => {
+        expect(new RomanDate('a.d.III.', 'Kal.', '', '').toString()).toEqual('a.d.III. Kal. ?? ??');
+        expect(new RomanDate('', '', 'Mart.', 'MMC').toString()).toEqual('?? Mart. MMC');
+        expect(new RomanDate('postr.', 'Non.', '', 'MD').toString()).toEqual('postridie Non. ?? MD');
+        expect(new RomanDate('', '', 'Jul.', '').toString()).toEqual('?? Jul. ??');
+        expect(new RomanDate('', '', '', '').toString()).toEqual('?? ?? ??');
+
+        expect(new RomanDate('', '', 'Feb.', 'MCMLXXXVII').toDate().toString()).toEqual('1987-2-??');
+    });
+
     function allDates(calendar: Calendar,
         action: (year: number, month: number, day: number, calendar: Calendar) => void,
         speedup = 1) {

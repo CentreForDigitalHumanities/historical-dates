@@ -1,4 +1,4 @@
-import { isLeapYear, parseDateString } from "./common";
+import { isLeapYear, parseDateString, JulianDays } from "./common";
 import { HistoricalDate } from './historical-date';
 import { InvalidDateException } from './invalid-date-exception';
 import { GregorianDate } from "./gregorian-date";
@@ -15,20 +15,20 @@ export class JulianDate extends HistoricalDate {
         return isLeapYear(this.year, this.calendar);
     }
 
-    constructor(public readonly year: number,
-        public readonly month: number,
-        public readonly day: number) {
+    constructor(public readonly year: number | undefined,
+        public readonly month: number | undefined,
+        public readonly day: number | undefined) {
         super('julian');
         this.assertLegalDate(year, month, day);
     }
 
     /**
      * Creates a new JulianDate object based on the number of Julian days.
-     * @param jd 
      */
-    static fromJulianDays(jd: number) {
-        jd += 0.5;
-        let z = Math.trunc(jd);
+    static fromJulianDays(jd: JulianDays) {
+        let days = jd.days;
+        days += 0.5;
+        let z = Math.trunc(days);
 
         let a = z;
         let b = a + 1524;
@@ -50,9 +50,12 @@ export class JulianDate extends HistoricalDate {
         }
         let day = b - d - Math.trunc(30.6001 * e);
 
-        return new JulianDate(year, month, day);
+        return new JulianDate(
+            jd.unknownYear ? undefined : year,
+            jd.unknownMonth ? undefined : month,
+            jd.unknownDay ? undefined : day);
     }
-    
+
     static fromString(text: string) {
         const parsed = parseDateString(text);
         if (parsed) {
@@ -64,8 +67,8 @@ export class JulianDate extends HistoricalDate {
     /**
      * Check if this is a legal date in the Julian calendar
      */
-    private assertLegalDate(year: number, month: number, day: number) {
-        if (day < 0 || day > this.monthLength(year, month)) {
+    private assertLegalDate(year: number | undefined, month: number | undefined, day: number | undefined) {
+        if (day !== undefined && (day < 0 || day > this.monthLength(year, month))) {
             throw new InvalidDateException(`Month ${month} doesn't have a day ${day}`);
         }
 
@@ -75,31 +78,38 @@ export class JulianDate extends HistoricalDate {
     /**
      * Convert to Julian day using astronomical years (0 = 1 BC, -1 = 2 BC)
      */
-    private toJulianDays(year: number = this.year,
-        month: number = this.month,
-        day: number = this.day) {
+    private toJulianDays(year: number = this.year || 1,
+        month: number = this.month || 1,
+        day: number = this.day || 1) {
         // Algorithm as given in Meeus, Astronomical Algorithms, Chapter 7, page 61
         if (month <= 2) {
             year -= 1;
             month += 12;
         }
 
-        return (Math.trunc((365.25 * (year + 4716))) + Math.trunc((30.6001 * (month + 1))) + day) - 1524.5
+        return {
+            days: (Math.trunc((365.25 * (year + 4716))) + Math.trunc((30.6001 * (month + 1))) + day) - 1524.5,
+            unknownYear: this.year === undefined,
+            unknownMonth: this.month === undefined,
+            unknownDay: this.day === undefined
+        }
     }
 
-    private monthLength(year: number, month: number) {
+    private monthLength(year: number | undefined, month: number | undefined) {
         return month == 2
             ? isLeapYear(year, 'julian') ? 29 : 28
-            : HAVE_30_DAYS.indexOf(month) >= 0 ? 30 : 31;
+            : HAVE_30_DAYS.indexOf(month || 1) >= 0 ? 30 : 31;
     }
 
     public addDays(days: number) {
         if (days == 0) { return this; }
-        return JulianDate.fromJulianDays(this.toJulianDays() + days);
+        const jd = this.toJulianDays();
+        jd.days += days;
+        return JulianDate.fromJulianDays(jd);
     }
 
     public toGregorian() {
-        let julianDays = this.toJulianDays();
+        const julianDays = this.toJulianDays();
         return GregorianDate.fromJulianDays(julianDays);
     }
 
@@ -108,6 +118,6 @@ export class JulianDate extends HistoricalDate {
     }
 
     public toString() {
-        return `${this.year}-${this.month}-${this.day} (Julian)`;
+        return `${this.year === undefined ? '??' : this.year}-${this.month === undefined ? '??' : this.month}-${this.day === undefined ? '??' : this.day} (Julian)`;
     }
 }

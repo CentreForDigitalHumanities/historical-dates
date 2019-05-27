@@ -1,4 +1,4 @@
-import { isLeapYear, parseDateString } from "./common";
+import { isLeapYear, parseDateString, JulianDays } from "./common";
 import { HistoricalDate } from './historical-date';
 import { InvalidDateException } from './invalid-date-exception';
 import { JulianDate } from "./julian-date";
@@ -25,18 +25,19 @@ const HAVE_30_DAYS = [4, 6, 9, 11];
 
 export class GregorianDate extends HistoricalDate {
     public get isLeapYear() {
-        return isLeapYear(this.year, this.calendar);
+        return this.year !== undefined && isLeapYear(this.year, this.calendar);
     }
 
-    constructor(public readonly year: number,
-        public readonly month: number,
-        public readonly day: number) {
+    constructor(public readonly year: number | undefined,
+        public readonly month: number | undefined,
+        public readonly day: number | undefined) {
         super('gregorian');
         this.assertLegalDate(year, month, day);
     }
 
-    static fromJulianDays(jd: number) {
-        let wjd = Math.floor(jd - 0.5) + 0.5;
+    static fromJulianDays(jd: JulianDays) {
+        const days = jd.days;
+        let wjd = Math.floor(days - 0.5) + 0.5;
         let depoch = wjd - EPOCH;
 
         let quadricent = Math.floor(depoch / INTERCALATION_CYCLE_DAYS);
@@ -72,7 +73,10 @@ export class GregorianDate extends HistoricalDate {
         let month = Math.floor((((yearDay + leapAdj) * 12) + 373) / 367);
         let day = Math.trunc(wjd - GregorianDate.toJulianDays(year, month, 1)) + 1;
 
-        return new GregorianDate(year, month, day);
+        return new GregorianDate(
+            jd.unknownYear ? undefined : year,
+            jd.unknownMonth ? undefined : month,
+            jd.unknownDay ? undefined : day);
     }
 
     static fromString(text: string) {
@@ -85,7 +89,9 @@ export class GregorianDate extends HistoricalDate {
 
     public addDays(days: number) {
         if (days == 0) { return this; }
-        return GregorianDate.fromJulianDays(this.toJulianDays() + days);
+        const jd = this.toJulianDays()
+        jd.days += days;
+        return GregorianDate.fromJulianDays(jd);
     }
 
     public toGregorian() {
@@ -97,7 +103,7 @@ export class GregorianDate extends HistoricalDate {
     }
 
     public toString() {
-        return `${this.year}-${this.month}-${this.day}`;
+        return `${this.year === undefined ? '??' : this.year}-${this.month === undefined ? '??' : this.month}-${this.day === undefined ? '??' : this.day}`;
     }
 
     /**
@@ -141,22 +147,28 @@ export class GregorianDate extends HistoricalDate {
             Math.floor((((367 * month) - 362) / 12) + leapAdj + day);
     }
 
-    private toJulianDays() {
-        return GregorianDate.toJulianDays(this.year, this.month, this.day);
+    private toJulianDays(): JulianDays {
+        const days = GregorianDate.toJulianDays(this.year || 1, this.month || 1, this.day || 1);
+        return {
+            days,
+            unknownYear: this.year === undefined,
+            unknownMonth: this.month === undefined,
+            unknownDay: this.day === undefined
+        }
     }
 
     /**
      * Check if this is a legal date in the Gregorian calendar
      */
-    private assertLegalDate(year: number, month: number, day: number) {
+    private assertLegalDate(year: number | undefined, month: number | undefined, day: number | undefined) {
         let daysInMonth: number;
         if (month == 2) {
             daysInMonth = isLeapYear(year) ? 29 : 28;
         } else {
-            daysInMonth = HAVE_30_DAYS.indexOf(month) >= 0 ? 30 : 31;
+            daysInMonth = HAVE_30_DAYS.indexOf(month || 1) >= 0 ? 30 : 31;
         }
 
-        if (day < 0 || day > daysInMonth) {
+        if (day !== undefined && (day < 0 || day > daysInMonth)) {
             throw new InvalidDateException(`Month ${month} doesn't have a day ${day}`);
         }
 

@@ -4,6 +4,13 @@ import { GregorianDate } from "./gregorian-date";
 import * as XRegExp from 'xregexp';
 import { fromRomanNumber } from './roman';
 
+export type JulianDays = {
+    days: number,
+    unknownYear: boolean,
+    unknownMonth: boolean,
+    unknownDay: boolean
+}
+
 const MonthPatterns: { [date: number]: string } =
 {
     1: '([ij]an(uar(y|ii?)|)|janvier)',
@@ -37,7 +44,8 @@ const DateFormats: RegExp[] = [
     .replace('{day}', NumberPattern)
     .replace('{year}', NumberPattern), 'i'));
 
-export function isLeapYear(year: number, calendar: Calendar = 'gregorian') {
+export function isLeapYear(year: number | undefined, calendar: Calendar = 'gregorian') {
+    if (year === undefined) { return false; }
     if (calendar == 'gregorian') {
         return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
     } else {
@@ -45,7 +53,11 @@ export function isLeapYear(year: number, calendar: Calendar = 'gregorian') {
     }
 }
 
-export function createDate(year: number, month: number, day: number, calendar: Calendar = 'gregorian') {
+export function createDate(
+    year: number | undefined,
+    month: number | undefined,
+    day: number | undefined,
+    calendar: Calendar = 'gregorian') {
     switch (calendar) {
         case 'gregorian':
             return new GregorianDate(year, month, day);

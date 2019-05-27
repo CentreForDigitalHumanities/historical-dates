@@ -36,6 +36,12 @@ describe('Gregorian dates', () => {
         }
     });
 
+    it('Allows partial dates', () => {
+        expect(createDate(1987, 2, undefined).toString()).toEqual('1987-2-??');
+        expect(createDate(1987, undefined, 27).toString()).toEqual('1987-??-27');
+        expect(createDate(undefined, undefined, 27).toString()).toEqual('??-??-27');
+    });
+
     function expectJulian(julianDay: number, julianMonth: number, julianYear: number,
         gregorianDay: number, gregorianMonth: number, gregorianYear: number) {
         let converted = createDate(gregorianYear, gregorianMonth, gregorianDay, 'gregorian').toJulian();

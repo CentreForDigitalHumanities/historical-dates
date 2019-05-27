@@ -6,9 +6,9 @@ import { GregorianDate } from "./gregorian-date";
 export abstract class HistoricalDate {
     constructor(public readonly calendar: Calendar) { }
 
-    abstract year: number;
-    abstract month: number;
-    abstract day: number;
+    abstract year: number | undefined;
+    abstract month: number | undefined;
+    abstract day: number | undefined;
     abstract readonly isLeapYear: boolean;
     abstract toGregorian(): GregorianDate;
     abstract toJulian(): JulianDate
@@ -20,7 +20,7 @@ export abstract class HistoricalDate {
 
     toDate(): Date {
         let gregorian = this.toGregorian();
-        return new Date(gregorian.year, gregorian.month - 1, gregorian.day);
+        return new Date(gregorian.year || 1, (gregorian.month || 1) - 1, (gregorian.day || 1));
     }
 
     /**
@@ -28,14 +28,14 @@ export abstract class HistoricalDate {
      */
     equals(other: HistoricalDate) {
         let converted: HistoricalDate;
-        if (this.calendar == 'gregorian') {
+        if (this.calendar === 'gregorian') {
             converted = other.toGregorian();
         } else {
             converted = other.toJulian();
         }
 
-        return this.year == converted.year &&
-            this.month == converted.month &&
-            this.day == converted.day;
+        return this.year === converted.year &&
+            this.month === converted.month &&
+            this.day === converted.day;
     }
 }

@@ -12,6 +12,12 @@ describe('Julian dates', () => {
         expectGregorian(25, 10, 1917, 7, 11, 1917);
     });
 
+    it('Allows partial dates', () => {
+        expect(new JulianDate(1987, 2, undefined).toString()).toEqual('1987-2-?? (Julian)');
+        expect(new JulianDate(1987, undefined, 27).toString()).toEqual('1987-??-27 (Julian)');
+        expect(new JulianDate(undefined, undefined, 27).toString()).toEqual('??-??-27 (Julian)');
+    });
+
     function expectGregorian(julianDay: number, julianMonth: number, julianYear: number,
         gregorianDay: number, gregorianMonth: number, gregorianYear: number) {
         let converted = new JulianDate(julianYear, julianMonth, julianDay).toGregorian();

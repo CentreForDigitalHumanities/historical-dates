@@ -22,6 +22,7 @@ export const RomanMonths = {
     "Nov.": 11,
     "Dec.": 12
 };
+const monthNames: RomanMonth[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
 export const RomanDays = {
     "": 1,
     "pr.": 2,
@@ -114,15 +115,26 @@ function matchBiggest<T>(text: string, patterns: [RegExp, T][]) {
 
 export class RomanDate {
     constructor(public day: RomanDay,
-        public text: RomanText,
-        public month: RomanMonth,
+        public text: RomanText | '',
+        public month: RomanMonth | '',
         public year: string,
         public calendar: Calendar = 'gregorian') {
     }
 
     static fromDate(date: HistoricalDate) {
-        let { romanDay, romanText, romanMonthName } = romanCalendar(date);
-        let romanYear = toRomanNumber(date.year);
+        let romanDay: RomanDay | '' = '',
+            romanText: RomanText | '' = '',
+            romanMonthName: RomanMonth | '' = '';
+        if (date.day !== undefined && date.month !== undefined) {
+            const roman = romanCalendar(date);
+            romanDay = roman.romanDay;
+            romanText = roman.romanText;
+            romanMonthName = roman.romanMonthName;
+        } else if (date.month !== undefined) {
+            romanMonthName = monthNames[date.month - 1];
+        }
+
+        let romanYear = date.year === undefined ? '' : toRomanNumber(date.year);
 
         return new RomanDate(romanDay, romanText, romanMonthName, romanYear, date.calendar);
     }
@@ -158,9 +170,9 @@ export class RomanDate {
     toString() {
         return [
             ...(this.day ? [RomanDayLong[this.day] || this.day] : []),
-            this.text,
-            this.month,
-            this.year].join(' ');
+            this.text === '' ? '??' : this.text,
+            this.month === '' ? '??' : this.month,
+            this.year === '' ? '??' : this.year].join(' ');
     }
 
     toDate() {
@@ -175,13 +187,16 @@ export class RomanDate {
 
         let date = germanCalendar(
             romanDay,
-            this.text,
-            RomanMonths[this.month],
+            this.text || "Kal.",
+            RomanMonths[this.month || "Ian."],
             germanYear,
             this.calendar);
 
-        return createDate(germanYear, date.month, date.day, this.calendar)
-            .addDays(offset);
+        return createDate(
+            this.year === '' ? undefined : germanYear,
+            this.month === '' ? undefined : date.month,
+            this.text === '' ? undefined : date.day,
+            this.calendar).addDays(offset);
     }
 }
 
@@ -299,12 +314,13 @@ function germanCalendar(romanDay: number, romanText: RomanText, romanMonth: numb
 }
 
 function romanCalendar(date: HistoricalDate) {
-    let day = date.day;
+    let day = date.day || 1;
+    let month = date.month || 1;
 
-    if ((day >= 15) && (date.month == 2) && date.isLeapYear) {
+    if ((day >= 15) && (month == 2) && date.isLeapYear) {
         day--;
     }
-    else if ((day == 14) && (date.month == 2) && date.isLeapYear) {
+    else if ((day == 14) && (month == 2) && date.isLeapYear) {
         return {
             romanDay: 'a.d.XVII.' as RomanDay,
             romanText: 'Kal.' as RomanText,
@@ -317,10 +333,10 @@ function romanCalendar(date: HistoricalDate) {
     let text: 0 | 1 | 2 = 0;
     let beforeText = 0;
     let textDay = day;
-    let romanMonth = date.month;
+    let romanMonth = month;
 
     if (textDay == 1) {
-        textDay = monthDays[date.month - 1] + 1;
+        textDay = monthDays[month - 1] + 1;
     }
 
     if ((romanMonth == 3) || (romanMonth == 5) || (romanMonth == 7) || (romanMonth == 10)) {
@@ -344,7 +360,7 @@ function romanCalendar(date: HistoricalDate) {
     }
 
     // how many days before the Kal. Id. or Non.?
-    beforeText = monthDays[date.month - 1] + 2 - textDay;
+    beforeText = monthDays[month - 1] + 2 - textDay;
 
     let romanDay: RomanDay, romanText: RomanText, romanMonthName: RomanMonth;
 
@@ -379,7 +395,6 @@ function romanCalendar(date: HistoricalDate) {
             throw new InvalidDateException(`Unhandled text type ${text}`);
     }
 
-    const monthNames: RomanMonth[] = ["Ian.", "Feb.", "Mart.", "Apr.", "Mai.", "Jun.", "Jul.", "Sext.", "Sept.", "Oct.", "Nov.", "Dec."];
     romanMonthName = monthNames[romanMonth - 1];
 
     return { romanDay, romanText, romanMonthName };
