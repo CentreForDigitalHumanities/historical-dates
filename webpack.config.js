@@ -1,7 +1,8 @@
 module.exports = {
     entry: './src/historical-dates.ts',
+    mode: 'production',
     output: {
-        filename: './dist/historical-dates.js',
+        filename: 'historical-dates.js',
         libraryTarget: 'umd'
     },
     devtool: "source-map",
@@ -9,10 +10,10 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js']
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader'
+                loader: 'awesome-typescript-loader'
             }
         ]
     }

@@ -36,14 +36,15 @@
     "@types/jasmine": "^2.6.2",
     "@types/karma": "^1.7.1",
     "@types/xregexp": "^3.0.29",
+    "awesome-typescript-loader": "^5.2.1",
     "jasmine": "^2.8.0",
-    "karma": "^2.0.4",
+    "karma": "^4.1.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.0",
-    "karma-typescript": "^3.0.8",
+    "karma-typescript": "^4.0.0",
     "typescript": "^2.6.1",
-    "ts-loader": "^3.1.1",
-    "webpack": "^3.8.1",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2",
     "xregexp": "^4.2.4"
   }
 }
