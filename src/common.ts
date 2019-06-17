@@ -1,3 +1,11 @@
+// polyfill for Math.trunc (IE11)
+if (!Math.trunc) {
+    Math.trunc = function (v) {
+        v = +v;
+        return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
+    };
+}
+
 import { Calendar } from './calendar';
 import { JulianDate } from "./julian-date";
 import { GregorianDate } from "./gregorian-date";
