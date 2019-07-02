@@ -8,7 +8,9 @@
     "prepublishOnly": "npm run build",
     "tsc": "tsc",
     "build": "webpack && npm run test",
-    "test": "karma start karma.conf.js --single-run",
+    "test": "npm run test:karma && npm run test:node",
+    "test:karma": "karma start karma.conf.js --single-run",
+    "test:node": "node test-node.js",
     "dev": "webpack --progress --colors --watch"
   },
   "repository": {
