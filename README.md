@@ -1,6 +1,6 @@
 # Historical Dates
 
-[![DOI](https://zenodo.org/badge/144034950.svg)](https://zenodo.org/badge/latestdoi/144034950)
+[![DOI](https://zenodo.org/badge/139458669.svg)](https://zenodo.org/badge/latestdoi/139458669)
 [![NPM](https://img.shields.io/npm/v/historical-dates.svg)](https://www.npmjs.com/package/historical-dates)
 Master: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=master)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
 Develop: [![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/historical-dates)
