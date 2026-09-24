@@ -9,6 +9,9 @@ JavaScript/TypeScript library for converting/calculating Roman and Easter dates.
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Friend: Do dates make you nervous?<br>Me: omg yes especially when doing math across timezone boundaries</p>&mdash; Daniel Cousineau (@dcousineau) <a href="https://twitter.com/dcousineau/status/760848423268519936?ref_src=twsrc%5Etfw">August 3, 2016</a></blockquote>
 </div>
 
+> [!WARNING]
+> This repository is archived because it is no longer under active development. If you are interested in using the code, or have other questions, please contact us through [cdh@uu.nl](mailto:cdh@uu.nl).
+
 ## Get Started
 
 ```
